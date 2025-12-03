@@ -1,0 +1,205 @@
+﻿@model CarRentalEmployeeApp.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Personel Kayıt";
+}
+
+<style>
+    /* Modern Dark Tema Renk Paleti */
+    :root {
+        --bg-dark: #1e1e2f; /* Ana Arkaplan */
+        --card-dark: #27293d; /* Kart Rengi */
+        --input-bg: #1d253b; /* Input İçi */
+        --text-main: #ffffff; /* Ana Yazı */
+        --text-muted: #9a9a9a; /* Silik Yazı */
+        --accent: #e14eca; /* Vurgu Rengi (İsteğe göre mavi de yapılabilir) */
+        --accent-hover: #ba3abb;
+        --primary-blue: #335ccb; /* Kurumsal Mavi */
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        font-family: 'Poppins', 'Segoe UI', sans-serif; /* Daha modern bir font ailesi */
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        align-items: center; /* Dikey ortalama */
+        justify-content: center;
+    }
+
+    .register-container {
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        background-color: var(--card-dark);
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4); /* Derin gölge */
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* Üstteki dekoratif çizgi */
+        .register-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent));
+        }
+
+    .form-header {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: var(--text-main);
+        letter-spacing: 1px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        display: block;
+        transition: color 0.3s;
+    }
+
+    .form-control {
+        background-color: var(--input-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text-main);
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+        /* Input focus olunca */
+        .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(225, 78, 202, 0.1); /* Hafif parlama */
+            color: #fff;
+        }
+
+        /* Placeholder rengini açma */
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Inputa tıklandığında label rengi değişsin */
+        .form-control:focus + label,
+        .form-group:focus-within label {
+            color: var(--accent);
+        }
+
+    .btn-register {
+        width: 100%;
+        padding: 14px;
+        margin-top: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(45deg, var(--primary-blue), var(--accent));
+        border: none;
+        color: white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225, 78, 202, 0.4);
+            color: white;
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+    .form-text-error {
+        font-size: 0.8rem;
+        color: #ff6b6b; /* Hata mesajı için daha yumuşak bir kırmızı */
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* İki sütunlu yapı için (Ad-Soyad yan yana) */
+    .row-g-2 {
+        display: flex;
+        gap: 10px;
+    }
+
+    .col-half {
+        flex: 1;
+    }
+
+</style>
+
+<div class="register-container">
+    <div class="form-header">Personel Kayıt</div>
+
+    <form asp-action="Register" method="post" novalidate>
+
+        <div class="row-g-2 form-group">
+            <div class="col-half">
+                <label asp-for="Name">Ad</label>
+                <input asp-for="Name" class="form-control" placeholder="Örn: Ahmet">
+                <span asp-validation-for="Name" class="form-text-error"></span>
+            </div>
+            <div class="col-half">
+                <label asp-for="Surname">Soyad</label>
+                <input asp-for="Surname" class="form-control" placeholder="Örn: Yılmaz">
+                <span asp-validation-for="Surname" class="form-text-error"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email">E-Posta Adresi</label>
+            <input asp-for="Email" class="form-control" placeholder="ornek@sirket.com">
+            <span asp-validation-for="Email" class="form-text-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone">Telefon Numarası</label>
+            <input asp-for="Phone" class="form-control" placeholder="+90 5XX XXX XX XX">
+            <span asp-validation-for="Phone" class="form-text-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address">Adres</label>
+            <input asp-for="Address" class="form-control" placeholder="Tam adres giriniz">
+            <span asp-validation-for="Address" class="form-text-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password">Şifre</label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="••••••••">
+            <span asp-validation-for="Password" class="form-text-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ConfirmPassword">Şifre Tekrar</label>
+            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="••••••••">
+            <span asp-validation-for="ConfirmPassword" class="form-text-error"></span>
+        </div>
+
+        <button type="submit" class="btn btn-register">Hesabı Oluştur</button>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
