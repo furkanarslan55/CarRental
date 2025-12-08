@@ -40,7 +40,7 @@ namespace CarRentalEmployeeApp.Controllers
                 if (roles.Contains("Admin"))
                     return RedirectToAction("AdminDashboard", "Admin"); // Admin paneli
                 else if (roles.Contains("Employee"))
-                    return RedirectToAction("AddCustomer", "Employee"); // Employee paneli
+                    return RedirectToAction("EmployeeDashboard", "Employee"); // Employee paneli
                 else
                     return RedirectToAction("Index", "Home"); // Default
             }

@@ -14,12 +14,21 @@ namespace CarRentalEmployeeApp.Controllers
     {
 
         private readonly CarRentalDbContext _context;
-        private readonly UserManager<Employee> _userManager;
+        private readonly UserManager<Employee> _userManager;//kullanıcı yönetimi için
         public EmployeeController(CarRentalDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
+
+        public  async Task<IActionResult> EmployeeDashboard()
+        {
+
+            return View();
+        }
+
+
+
 
 
         // Dashboard: kendi müşteri listesini görür
@@ -80,9 +89,10 @@ namespace CarRentalEmployeeApp.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCustomer(CustomerCreateViewModel model)
         {
+            var employee = await _userManager.GetUserAsync(User);
             if (!ModelState.IsValid)
                 return View(model);
-            var employee = await _userManager.GetUserAsync(User);
+          
             if (employee == null)
                 return Unauthorized();
 
