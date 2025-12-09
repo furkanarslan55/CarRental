@@ -34,18 +34,28 @@ namespace CarRentalEmployeeApp.Controllers
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email); // kullanıcının mailini alıp o mailden rolunu öğreniyoruz
+                var user = await _userManager.FindByEmailAsync(model.Email);
                 var roles = await _userManager.GetRolesAsync(user);
 
+                TempData["LoginSuccess"] = "Giriş başarılı! Yönlendiriliyorsunuz...";
+
                 if (roles.Contains("Admin"))
-                    return RedirectToAction("AdminDashboard", "Admin"); // Admin paneli
+                {
+                    TempData["RedirectUrl"] = Url.Action("AdminDashboard", "Admin");
+                }
                 else if (roles.Contains("Employee"))
-                    return RedirectToAction("EmployeeDashboard", "Employee"); // Employee paneli
+                {
+                    TempData["RedirectUrl"] = Url.Action("EmployeeDashboard", "Employee");
+                }
                 else
-                    return RedirectToAction("Index", "Home"); // Default
+                {
+                    TempData["RedirectUrl"] = Url.Action("Index", "Home");
+                }
+
+                return View(model); // aynı view'a dönüp mesajı göstereceğiz
             }
 
-            TempData["LoginFailed"] = "E-posta veya şifre hatalı";
+            ViewBag.LoginFailed = "E-posta veya şifre hatalı";
             return View(model);
         }
 

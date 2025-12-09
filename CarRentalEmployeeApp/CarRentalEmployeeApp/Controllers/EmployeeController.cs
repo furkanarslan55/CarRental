@@ -9,7 +9,7 @@ using System;
 
 namespace CarRentalEmployeeApp.Controllers
 {
-    [Authorize(Roles ="Employee")]
+    [Authorize(Roles ="Employee, Admin")]
     public class EmployeeController : Controller
     {
 
@@ -32,6 +32,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
         // Dashboard: kendi müşteri listesini görür
+        [HttpGet]
         public async Task<IActionResult> DashboardCustomer()
         {
             var employee = await _userManager.GetUserAsync(User); //employe içindeki ıd yi alıyoruz
@@ -40,14 +41,11 @@ namespace CarRentalEmployeeApp.Controllers
             var customers = _context.customers
                 .Where(c => c.EmployeeId == employee.Id)
                 .ToList();
-
-
+       
             return View(customers);
         }
 
       
-
-
 
 
 
@@ -76,7 +74,8 @@ namespace CarRentalEmployeeApp.Controllers
                     .ToListAsync()
 
 
-            };            return View(model);
+            };     
+            return View(model);
         }
 
 

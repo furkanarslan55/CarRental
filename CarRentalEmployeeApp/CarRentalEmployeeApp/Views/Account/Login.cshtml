@@ -3,21 +3,75 @@
     ViewData["Title"] = "Giriş Yap";
     Layout = null;
 }
-@if (TempData["LoginFailed"] != null)
+@if (ViewBag.LoginFailed != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Hata!</strong> @TempData["LoginFailed"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    <div class="custom-alert error-alert animate__animated animate__fadeInDown">
+        <i class="bi bi-x-circle-fill"></i>
+        <span><strong>Hata!</strong> @ViewBag.LoginFailed</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
+
 @if (TempData["LoginSuccess"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> <strong>Başarılı!</strong> @TempData["LoginSuccess"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    <div class="custom-alert success-alert animate__animated animate__fadeInDown">
+        <i class="bi bi-check-circle-fill"></i>
+        <span><strong>Başarılı!</strong> @TempData["LoginSuccess"]</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+
+    <script>
+        setTimeout(function () {
+            window.location.href = '@TempData["RedirectUrl"]';
+        }, 4000); // 3 saniye
+    </script>
 }
+<style>
+    .custom-alert {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 18px;
+        border-radius: 12px;
+        font-size: 15px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .custom-alert i {
+            font-size: 22px;
+        }
+
+        .custom-alert .btn-close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+        }
+
+    .success-alert {
+        background: #d1f7e2;
+        border-left: 5px solid #28a745;
+        color: #1b5e20;
+    }
+
+        .success-alert i {
+            color: #28a745;
+        }
+
+    .error-alert {
+        background: #ffe0e3;
+        border-left: 5px solid #dc3545;
+        color: #7a1a22;
+    }
+
+        .error-alert i {
+            color: #dc3545;
+        }
+</style>
+
+
 
 
 <!DOCTYPE html>
@@ -174,7 +228,7 @@
     <div class="login-wrapper">
         <div class="glass-card">
             <h2 class="brand-title">CarRental</h2>
-            <p class="brand-subtitle">Personel Paneli</p>
+           
 
             <form asp-action="Login" method="post" autocomplete="off">
 

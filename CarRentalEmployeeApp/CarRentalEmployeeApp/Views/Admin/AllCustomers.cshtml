@@ -1,0 +1,113 @@
+﻿@model List<Customers>
+@{
+    ViewData["Title"] = "Tüm Müşteriler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .table-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+    }
+
+        .table-card .card-header {
+            background: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+    table thead {
+        background: #f8f9fa;
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    table tbody tr:hover {
+        background: #f3f6fb;
+        cursor: pointer;
+    }
+
+    .badge-emp {
+        padding: 7px 10px;
+        border-radius: 10px;
+    }
+</style>
+
+
+<!-- 🔍 TEK ARAMA KUTUSU -->
+<div class="card p-3 mt-4 mb-3">
+    <input id="searchInput" class="form-control" placeholder="Müşteriler içinde ara... (ID, Ad, Email vb.)" />
+</div>
+
+
+<!-- 📄 TABLO -->
+<div class="card table-card">
+    <div class="card-header">
+        <i class="fa-solid fa-users text-primary me-2"></i> Müşteri Listesi
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0" id="customerTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ad</th>
+                    <th>Soyad</th>
+                    <th>Email</th>
+                    <th>Telefon</th>
+                    <th>Adres</th>
+                    <th>Atanan Personel</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>@customer.Id</td>
+                        <td>@customer.Name</td>
+                        <td>@customer.Surname</td>
+                        <td>@customer.Email</td>
+                        <td>@customer.PhoneNumber</td>
+                        <td>@customer.Address</td>
+
+                        <td>
+                            @if (customer.Employee != null)
+                            {
+                                <span class="badge bg-primary bg-opacity-10 text-primary badge-emp">
+                                    <i class="fa-solid fa-user me-1"></i>
+                                    @customer.Employee.Name @customer.Employee.Surname
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary badge-emp">
+                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                    Sorumlu Yok
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- 🔎 TEK INPUT FİLTRELEME SCRIPT'İ -->
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#customerTable tbody tr");
+
+        rows.forEach(row => {
+            let rowText = row.innerText.toLowerCase();
+            row.style.display = rowText.includes(value) ? "" : "none";
+        });
+    });
+</script>

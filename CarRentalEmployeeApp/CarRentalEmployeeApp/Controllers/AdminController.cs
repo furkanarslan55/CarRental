@@ -220,6 +220,18 @@ namespace CarRentalEmployeeApp.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("GetEmploye");
         }
+        [HttpGet]
+        public async Task<IActionResult> AllCustomers()
+        {
+            var customersall = await _context.customers.ToListAsync();
+              
+                
+            return View(customersall);
+
+
+
+
+        }
     }
 }
 

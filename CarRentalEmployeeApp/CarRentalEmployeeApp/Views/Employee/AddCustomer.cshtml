@@ -1,6 +1,7 @@
 ﻿@model CarRentalEmployeeApp.ViewModels.CustomerCreateViewModel
 
 @{
+    Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
     ViewData["Title"] = "Yeni Müşteri Ekle";
 }
 
@@ -43,8 +44,3 @@
 
 </form>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
