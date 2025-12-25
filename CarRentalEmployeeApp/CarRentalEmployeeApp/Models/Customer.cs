@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CarRentalEmployeeApp.Models
 
 {
-    public class Customers
+    public class Customer
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -12,6 +12,7 @@ namespace CarRentalEmployeeApp.Models
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
 
+        public ICollection<Rental> Rentals { get; set; }
         public string EmployeeId { get; set; }
         
         public Employee Employee { get; set; }

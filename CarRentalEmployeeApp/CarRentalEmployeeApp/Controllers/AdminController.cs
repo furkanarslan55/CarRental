@@ -39,6 +39,7 @@ namespace CarRentalEmployeeApp.Controllers
             return View(_id);
         }
         [HttpGet]
+
         public async Task<IActionResult> Createcar()
         {
             return View();
@@ -132,9 +133,9 @@ namespace CarRentalEmployeeApp.Controllers
         public async Task<IActionResult> AdminDashboard()
         {
             var totalVehicles = await _context.Vehicles.CountAsync();
-            var rentedVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Rented);
-            var availableVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Available);
-            var maintenanceVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Maintenance);
+            var rentedVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.busy);
+            var availableVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.flexible);
+            var maintenanceVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.manintance);
             var totalEmployees = await _context.Employee.CountAsync();
 
             var employees = await _context.Employee.ToListAsync();
@@ -228,10 +229,8 @@ namespace CarRentalEmployeeApp.Controllers
                 
             return View(customersall);
 
-
-
-
         }
+        
     }
 }
 

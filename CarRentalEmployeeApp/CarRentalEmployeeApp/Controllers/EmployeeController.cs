@@ -67,10 +67,10 @@ namespace CarRentalEmployeeApp.Controllers
                     .Where(v => v.AssignedToId == employee.Id)
                     .ToListAsync(),
                 RentedVehicles = await _context.Vehicles
-                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.Rented)
+                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.busy)
                     .ToListAsync(),
                 MaintenanceVehicles = await _context.Vehicles
-                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.Maintenance)
+                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.manintance)
                     .ToListAsync()
 
 
@@ -85,6 +85,7 @@ namespace CarRentalEmployeeApp.Controllers
             return View();
         }
 
+
         [HttpPost]
         public async Task<IActionResult> AddCustomer(CustomerCreateViewModel model)
         {
@@ -95,7 +96,7 @@ namespace CarRentalEmployeeApp.Controllers
             if (employee == null)
                 return Unauthorized();
 
-           var createcustomer = new Customers
+           var createcustomer = new Customer
             {
                 Name = model.Name,
                 Surname = model.Surname,
@@ -136,7 +137,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> GetCustomerUpdate(Customers customers)
+        public async Task<IActionResult> GetCustomerUpdate(Customer customers)
         {
             if (!ModelState.IsValid)
                 return View(customers);

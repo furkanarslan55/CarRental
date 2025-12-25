@@ -12,7 +12,7 @@ namespace CarRentalEmployeeApp.Models
 
        
         public virtual ICollection<Vehicle> AssignedVehicles { get; set; }
-        public virtual ICollection<Customers> Customers { get; set; }
+        public virtual ICollection<Customer> Customers { get; set; }
     }
 
 }

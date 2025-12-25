@@ -4,9 +4,18 @@ namespace CarRentalEmployeeApp.Models
 {
     public enum VehicleStatus
     {
-        Available,  // Kolay filtreleme ve yönetilebilirlik için
-        Rented,
-        Maintenance
+       
+            flexible,
+            busy,
+            manintance,
+
+    }
+    public enum AssignmentStatus
+    {
+        
+        free,
+            appointed
+
     }
 
     public class Vehicle
@@ -28,7 +37,9 @@ namespace CarRentalEmployeeApp.Models
         public int kilometer { get; set; }
 
         [Required(ErrorMessage = "Durum seçilmelidir.")]
-        public VehicleStatus Status { get; set; } = VehicleStatus.Available;
+        public VehicleStatus Status { get; set; } = VehicleStatus.flexible;
+
+        public AssignmentStatus AssignmentStatus { get; set; } = AssignmentStatus.free;
 
         // Sorumlu çalışan
         public string? AssignedToId { get; set; }

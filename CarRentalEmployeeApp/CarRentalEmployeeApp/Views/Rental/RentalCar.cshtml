@@ -1,0 +1,50 @@
+﻿@model IEnumerable<CarRentalEmployeeApp.Models.Vehicle>
+@{
+    Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
+    ViewData["Title"] = "Yeni Kiralama";
+}
+@{
+    ViewData["Title"] = "Kiralanabilir Araçlar";
+}
+
+<h2>Kiralanabilir Araçlar</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Kiralanabilir araç bulunmamaktadır.
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Plaka</th>
+                <th>Model</th>
+                <th>Yıl</th>
+                <th>Kilometre</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicle in Model)
+            {
+                <tr>
+                    <td>@vehicle.PlateNumber</td>
+                    <td>@vehicle.CarModel</td>
+                    <td>@vehicle.Year</td>
+                    <td>@vehicle.kilometer</td>
+                    <td>
+                        <!-- BUTON TIKLANINCA RENT GET ÇALIŞIR -->
+                        <a asp-action="Rent"
+                           asp-route-id="@vehicle.Id"
+                           class="btn btn-success btn-sm">
+                            Kirala
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

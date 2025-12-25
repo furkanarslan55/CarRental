@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Araç Yetkilendirme";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<CarRentalEmployeeApp.Models.Vehicle>
+
+
+
+<h2>Ata­ma İçin Uygun Araçlar</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Uygun araç bulunamadı.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plaka</th>
+                <th>Yıl</th>
+                <th>Model</th>
+                <th>Kilometre</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var car in Model)
+            {
+                <tr>
+                    <td>@car.Id</td>
+                    <td>@car.PlateNumber</td>
+                    <td>@car.Year</td>
+                    <td>@car.CarModel</td>
+                    <td>@car.kilometer</td>
+
+                    <td>
+                        <a asp-action="AssignmentToEmployee"
+                           asp-route-id="@car.Id"
+                           class="btn btn-sm btn-primary">
+                            Ata
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

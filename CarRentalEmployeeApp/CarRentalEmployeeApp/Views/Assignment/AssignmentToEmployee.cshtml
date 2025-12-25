@@ -1,0 +1,49 @@
+﻿@model CarRentalEmployeeApp.ViewModels.AssignmentToEmployeeView
+
+@{
+    ViewData["Title"] = "Araç Çalışana Atama";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Araç Çalışana Atama</h2>
+
+<hr />
+
+<!-- Araç Bilgileri -->
+<div class="card mb-3">
+    <div class="card-header">
+        Araç Bilgileri
+    </div>
+    <div class="card-body">
+        <p><strong>Plaka:</strong> @Model.PlateNumber</p>
+        <p><strong>Model:</strong> @Model.CarModel</p>
+        <p><strong>Yıl:</strong> @Model.Year</p>
+    </div>
+</div>
+
+<!-- Atama Formu -->
+<form asp-action="AssignCarToEmployee" method="post">
+    <input type="hidden" asp-for="VehicleId" />
+    <input type="hidden" asp-for="Created" />
+
+    <div class="mb-3">
+        <label class="form-label">Çalışan Seç</label>
+        <select asp-for="SelectedEmployeeId" class="form-select">
+            <option value="">-- Çalışan Seçiniz --</option>
+            @foreach (var employee in Model.EmployeName)
+            {
+                <option value="@employee.Id">
+                    @employee.Name @employee.Surname
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Araç Ata
+    </button>
+
+    <a asp-action="AssignmentToCar" class="btn btn-secondary">
+        Geri Dön
+    </a>
+</form>
