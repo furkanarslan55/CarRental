@@ -1,0 +1,79 @@
+﻿@model CarRentalEmployeeApp.ViewModels.EmployeeDetailViewModel
+
+@{
+    ViewData["Title"] = "Çalışan Detayları";
+}
+
+<h2 class="mb-4">Çalışan Bilgileri</h2>
+
+<!-- ÇALIŞAN BİLGİLERİ -->
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Çalışan Bilgileri</strong>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Ad</label>
+                <input class="form-control" value="@Model.Name" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Soyad</label>
+                <input class="form-control" value="@Model.Surname" readonly />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" value="@Model.Email" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Telefon</label>
+                <input class="form-control" value="@Model.PhoneNumber" readonly />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ARAÇ BİLGİLERİ -->
+<div class="card">
+    <div class="card-header">
+        <strong>Sorumlu Araçlar</strong>
+    </div>
+    <div class="card-body">
+        @if (Model.Vehicles != null && Model.Vehicles.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Plaka</th>
+                        <th>Araç Modeli</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var vehicle in Model.Vehicles)
+                    {
+                        <tr>
+                            <td>@vehicle.Id</td>
+                            <td>@vehicle.Plate</td>
+                            <td>@vehicle.Brand</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning mb-0">
+                Bu çalışana atanmış araç bulunmamaktadır.
+            </div>
+        }
+    </div>
+</div>
+
+<!-- GERİ DÖN -->
+<div class="mt-4">
+    <a asp-action="GetEmploye" class="btn btn-secondary">Geri Dön</a>
+</div>

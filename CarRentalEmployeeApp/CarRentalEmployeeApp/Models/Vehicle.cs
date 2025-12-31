@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace CarRentalEmployeeApp.Models
 {
     public enum VehicleStatus
     {
        
-            flexible,
-            busy,
-            manintance,
+            flexible= 0,
+            busy=1,
+            manintance =2,
 
     }
     public enum AssignmentStatus
@@ -17,6 +18,7 @@ namespace CarRentalEmployeeApp.Models
             appointed
 
     }
+    [Index(nameof(PlateNumber), IsUnique = true)]
 
     public class Vehicle
     {
@@ -25,6 +27,7 @@ namespace CarRentalEmployeeApp.Models
         [Required(ErrorMessage = "Plaka zorunludur.")]
         [StringLength(10, ErrorMessage = "Plaka en fazla 10 karakter olabilir.")]
         public string PlateNumber { get; set; }
+        public string CarBrand { get; set;  }
 
         [Required(ErrorMessage = "Araç modeli zorunludur.")]
         [StringLength(50, ErrorMessage = "Araç modeli en fazla 50 karakter olabilir.")]
@@ -35,6 +38,9 @@ namespace CarRentalEmployeeApp.Models
 
         [Range(0, int.MaxValue, ErrorMessage = "Kilometre negatif olamaz.")]
         public int kilometer { get; set; }
+        public string Type { get; set;  }
+        public string GearType { get; set; }
+
 
         [Required(ErrorMessage = "Durum seçilmelidir.")]
         public VehicleStatus Status { get; set; } = VehicleStatus.flexible;
@@ -43,6 +49,7 @@ namespace CarRentalEmployeeApp.Models
 
         // Sorumlu çalışan
         public string? AssignedToId { get; set; }
+        public ICollection<VehicleDamage> Damages { get; set; }
 
         public virtual Employee? AssignedTo { get; set; }
     }

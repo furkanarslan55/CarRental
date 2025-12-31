@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalEmployeeApp.Migrations
 {
     [DbContext(typeof(CarRentalDbContext))]
-    [Migration("20251225140327_kontrol")]
-    partial class kontrol
+    [Migration("20251225160402_ilk")]
+    partial class ilk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -218,6 +218,9 @@ namespace CarRentalEmployeeApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
+
+                    b.HasIndex("PlateNumber")
+                        .IsUnique();
 
                     b.ToTable("Vehicles");
                 });

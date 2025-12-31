@@ -1,0 +1,101 @@
+﻿@model List<CarRentalEmployeeApp.Models.Vehicle>
+
+@{
+    ViewData["Title"] = "Tüm Araçlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<h2>Tüm Araçlar</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Kayıtlı araç bulunamadı.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plaka</th>
+                <th>Yıl</th>
+                <th>Model</th>
+                <th>Kilometre</th>
+                <th>Sorumlu</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var car in Model)
+            {
+                <tr>
+                    <td>@car.Id</td>
+                    <td>@car.PlateNumber</td>
+                    <td>@car.Year</td>
+                    <td>@car.CarModel</td>
+                    <td>@car.kilometer</td>
+
+                    <td>
+                        @if (car.AssignedTo != null)
+                        {
+                            @($"{car.AssignedTo.Name} {car.AssignedTo.Surname}")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Atama Yok</span>
+                        }
+                    </td>
+
+                    <td>
+                        @{
+                            string statusText = car.Status switch
+                            {
+                                CarRentalEmployeeApp.Models.VehicleStatus.flexible => "Müsait",
+                                CarRentalEmployeeApp.Models.VehicleStatus.busy => "Kirada",
+                                CarRentalEmployeeApp.Models.VehicleStatus.manintance => "Bakımda",
+                                _ => "Bilinmiyor"
+                            };
+                        }
+                        @statusText
+                    </td>
+
+                    <td>
+                        <a asp-action="DetailsEmploye"
+                           asp-route-id="@car.Id"
+                           class="btn btn-info btn-sm">
+                            Detay
+                        </a>
+
+                        <a asp-action="Updatecar"
+                           asp-route-id="@car.Id"
+                           class="btn btn-warning btn-sm">
+                            Düzenle
+                        </a>
+
+                        <!-- DELETE FORM -->
+                        <form asp-action="Deletecar"
+                              asp-route-id="@car.Id"
+                              method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Sil
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CarRentalEmployeeApp.Migrations
 {
     /// <inheritdoc />
-    public partial class taban : Migration
+    public partial class ilk : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -190,10 +190,11 @@ namespace CarRentalEmployeeApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PlateNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Model = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CarModel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     kilometer = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    AssignmentStatus = table.Column<int>(type: "int", nullable: false),
                     AssignedToId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -204,6 +205,43 @@ namespace CarRentalEmployeeApp.Migrations
                         column: x => x.AssignedToId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rentals",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    StartRental = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndRental = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rentals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rentals_AspNetUsers_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Rentals_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Rentals_customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -251,9 +289,30 @@ namespace CarRentalEmployeeApp.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Rentals_CustomerId",
+                table: "Rentals",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rentals_EmployeeId",
+                table: "Rentals",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rentals_VehicleId",
+                table: "Rentals",
+                column: "VehicleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_AssignedToId",
                 table: "Vehicles",
                 column: "AssignedToId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_PlateNumber",
+                table: "Vehicles",
+                column: "PlateNumber",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -275,13 +334,16 @@ namespace CarRentalEmployeeApp.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "customers");
+                name: "Rentals");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "customers");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

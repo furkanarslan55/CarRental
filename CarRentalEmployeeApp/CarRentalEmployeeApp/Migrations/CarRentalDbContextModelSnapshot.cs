@@ -106,7 +106,7 @@ namespace CarRentalEmployeeApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
@@ -127,6 +127,10 @@ namespace CarRentalEmployeeApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -134,6 +138,10 @@ namespace CarRentalEmployeeApp.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasFilter("[PhoneNumber] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -193,10 +201,18 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Property<int>("AssignmentStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("CarBrand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CarModel")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("GearType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlateNumber")
                         .IsRequired()
@@ -205,6 +221,10 @@ namespace CarRentalEmployeeApp.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -216,7 +236,41 @@ namespace CarRentalEmployeeApp.Migrations
 
                     b.HasIndex("AssignedToId");
 
+                    b.HasIndex("PlateNumber")
+                        .IsUnique();
+
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("CarRentalEmployeeApp.Models.VehicleDamage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DamageType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ReportDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleDamage");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -399,6 +453,17 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Navigation("AssignedTo");
                 });
 
+            modelBuilder.Entity("CarRentalEmployeeApp.Models.VehicleDamage", b =>
+                {
+                    b.HasOne("CarRentalEmployeeApp.Models.Vehicle", "Vehicle")
+                        .WithMany("Damages")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -460,6 +525,11 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Navigation("AssignedVehicles");
 
                     b.Navigation("Customers");
+                });
+
+            modelBuilder.Entity("CarRentalEmployeeApp.Models.Vehicle", b =>
+                {
+                    b.Navigation("Damages");
                 });
 #pragma warning restore 612, 618
         }

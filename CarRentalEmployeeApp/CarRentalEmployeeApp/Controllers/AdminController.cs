@@ -12,17 +12,19 @@ namespace CarRentalEmployeeApp.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-
+        private readonly UserManager<Employee> _userManager;
         private readonly CarRentalDbContext _context;
-        public AdminController(CarRentalDbContext context)
+        public AdminController(CarRentalDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         [HttpGet]
         public async Task<IActionResult> GetCarAll()
         {
 
-            List<Vehicle> vehicles = await _context.Vehicles.ToListAsync();
+            List<Vehicle> vehicles = await _context.Vehicles.Include(v=> v.AssignedTo).
+                ToListAsync();
 
             return View(vehicles);
         }
@@ -53,21 +55,19 @@ namespace CarRentalEmployeeApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState
-                                .Where(x => x.Value.Errors.Count > 0)
-                                .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) });
-
-                foreach (var err in errors)
-                {
-                    Console.WriteLine($"{err.Field}: {string.Join(", ", err.Errors)}");
-                }
-
                 return View(model);
             }
 
+            // 🚨 AYNI PLAKA KONTROLÜ
+            bool plateExists = await _context.Vehicles
+                .AnyAsync(v => v.PlateNumber == model.PlateNumber);
 
+            if (plateExists)
+            {
+                ModelState.AddModelError("PlateNumber", "Bu plakaya sahip bir araç zaten kayıtlı.");
+                return View(model);
+            }
 
-            // ViewModel’den Entity oluşturdum
             var vehicle = new Vehicle
             {
                 PlateNumber = model.PlateNumber,
@@ -80,7 +80,7 @@ namespace CarRentalEmployeeApp.Controllers
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("AdminDashboard","Admin");
+            return RedirectToAction("AdminDashboard", "Admin");
         }
 
 
@@ -119,17 +119,27 @@ namespace CarRentalEmployeeApp.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> Deletecar(int id)
+        public async Task<IActionResult> Deletecar(int Id)
         {
-            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(a => a.Id ==Id);
             if (vehicle == null)
             {
                 return NotFound("ARAÇ BULUNAMADI");
             }
+            if(vehicle.AssignmentStatus == AssignmentStatus.appointed || vehicle.Status == VehicleStatus.busy)
+            {
+
+                TempData["Error"] = "Araç silinemez";
+              return RedirectToAction("GetCarAll");
+            }
+
+
             _context.Vehicles.Remove(vehicle);
             await _context.SaveChangesAsync();
             return RedirectToAction("GetCarAll");
         }
+
+
         public async Task<IActionResult> AdminDashboard()
         {
             var totalVehicles = await _context.Vehicles.CountAsync();
@@ -160,8 +170,17 @@ namespace CarRentalEmployeeApp.Controllers
 
         {
             var employess = await _context.Employee.ToListAsync();
+            var model = employess.Select(e => new EmployeeListViewModel
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Surname = e.Surname,
+                Email = e.Email,
+               PhoneNumber = e.PhoneNumber
+           
+            }).ToList();
 
-            return View(employess);
+            return View(model);
 
 
         }
@@ -171,66 +190,166 @@ namespace CarRentalEmployeeApp.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> CreateEmploye(Employee employe)
+        public async Task<IActionResult> CreateEmploye(PersonelCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(employe);
+                return View(model);
             }
-            _context.Employee.Add(employe);
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "Bu email zaten kayıtlı.");
+                return View(model);
+            }
+
+            var user = new Employee
+            {
+                Name = model.Name,
+                Surname = model.Surname,
+                Address = model.Address,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+          
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if(result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "Employee");
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            _context.Employee.Add(user);
             await _context.SaveChangesAsync();
+
             return RedirectToAction("GetEmploye");
-                
+
         }
         [HttpGet]
-        public async Task<IActionResult> UpdateEmploye(string id)
+        public async Task<IActionResult> UpdateEmploye(string Id)
         {
-            var updateemploye = await _context.Employee.FirstOrDefaultAsync(e => e.Id == id);
+            var updateemploye = await _context.Employee.FirstOrDefaultAsync(e => e.Id == Id);
             if (updateemploye == null)
             {
                 return NotFound("ÇALIŞAN BULUNAMADI");
             }
-            return View(updateemploye);
-
-        }
-
-        public async Task<IActionResult> UpdateEmploye(Employee employe)
-        {
-
-            if (!ModelState.IsValid)
+            var model = new UpdateEmployeViewModel
             {
-                return View(employe);
-
-            }
-            _context.Employee.Update(employe);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("GetEmploye");
-
+               
+                Name = updateemploye.Name,
+                Surname = updateemploye.Surname,
+                Email = updateemploye.Email,
+                PhoneNumber = updateemploye.PhoneNumber,
+                Address = updateemploye.Address
+            };
+            return View(model);
 
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteEmploye(string id)
+        public async Task<IActionResult> UpdateEmploye(UpdateEmployeViewModel model)
         {
-            var employe = await _context.Employee.FirstOrDefaultAsync(e => e.Id ==id);
+            var employe = await _context.Employee.FirstOrDefaultAsync(e => e.Id == model.Id);
+
             if (employe == null)
             {
                 return NotFound("ÇALIŞAN BULUNAMADI");
             }
-            _context.Employee.Remove(employe);
+
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Veri uyuşmazlığı";
+                return View(model);
+
+            }
+      
+
+
+            employe.Name = model.Name;
+            employe.Surname = model.Surname;
+            employe.Email = model.Email;
+            employe.PhoneNumber = model.PhoneNumber;
+            employe.Address = model.Address;
+        
+
+
             await _context.SaveChangesAsync();
             return RedirectToAction("GetEmploye");
-        }
-        [HttpGet]
-        public async Task<IActionResult> AllCustomers()
-        {
-            var customersall = await _context.customers.ToListAsync();
-              
-                
-            return View(customersall);
+
 
         }
-        
+
+        public async Task<IActionResult> DetailsEmploye(string Id)
+        {
+            var employee = await _context.Employee
+        .Include(e => e.AssignedVehicles)
+        .FirstOrDefaultAsync(e => e.Id == Id);
+            if (employee == null)
+            {
+                return NotFound("ÇALIŞAN BULUNAMADI");
+            }
+            var model = new EmployeeDetailViewModel
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                Surname = employee.Surname,
+                Email = employee.Email,
+                PhoneNumber = employee.PhoneNumber,
+                Vehicles = employee.AssignedVehicles.Select(v => new VehicleViewModel
+                {
+                    Id = v.Id,
+                    Plate = v.PlateNumber,
+                    Brand = v.CarModel
+                }).ToList()
+            };
+
+            return View(model);
+
+
+
+
+
+            
+        }
+
+
+
+
+
+
+
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteEmploye(string Id)
+        {
+            var employe = await _context.Employee
+                .Include(e => e.AssignedVehicles)
+                .FirstOrDefaultAsync(e => e.Id == Id);
+
+            if (employe == null)
+            {
+                return NotFound("ÇALIŞAN BULUNAMADI");
+            }
+
+            if (employe.AssignedVehicles.Any())
+            {
+                TempData["ErrorMessage"] = "Bu çalışana zimmetli araç var, silinemez.";
+                return RedirectToAction("GetEmploye");
+            }
+
+            _context.Employee.Remove(employe);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Çalışan başarıyla silindi.";
+            return RedirectToAction("GetEmploye");
+        }
+
+
     }
 }
 
