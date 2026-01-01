@@ -28,9 +28,10 @@ else
                 <th>ID</th>
                 <th>Plaka</th>
                 <th>Yıl</th>
+                <th>Marka</th>
                 <th>Model</th>
                 <th>Kilometre</th>
-                <th>Sorumlu</th>
+                <th>Sorumlu Kişi</th>
                 <th>Durum</th>
                 <th>İşlemler</th>
             </tr>
@@ -42,8 +43,11 @@ else
                     <td>@car.Id</td>
                     <td>@car.PlateNumber</td>
                     <td>@car.Year</td>
-                    <td>@car.CarModel</td>
+                    <td>@car.CarBrand</td>
+                    <td>@car.CarModel</td> 
                     <td>@car.kilometer</td>
+                  
+
 
                     <td>
                         @if (car.AssignedTo != null)

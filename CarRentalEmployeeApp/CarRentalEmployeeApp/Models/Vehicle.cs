@@ -39,7 +39,7 @@ namespace CarRentalEmployeeApp.Models
         [Range(0, int.MaxValue, ErrorMessage = "Kilometre negatif olamaz.")]
         public int kilometer { get; set; }
         public string Type { get; set;  }
-        public string GearType { get; set; }
+     
 
 
         [Required(ErrorMessage = "Durum seçilmelidir.")]
@@ -49,7 +49,7 @@ namespace CarRentalEmployeeApp.Models
 
         // Sorumlu çalışan
         public string? AssignedToId { get; set; }
-        public ICollection<VehicleDamage> Damages { get; set; }
+        public ICollection<VehicleDamage> Damages { get; set; } = new List<VehicleDamage>();
 
         public virtual Employee? AssignedTo { get; set; }
     }

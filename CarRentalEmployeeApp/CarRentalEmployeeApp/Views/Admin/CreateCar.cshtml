@@ -1,4 +1,5 @@
 ﻿@model CarRentalEmployeeApp.ViewModels.CreateVehicleViewModel
+
 @{
     ViewData["Title"] = "Yeni Araç Ekle";
 }
@@ -11,62 +12,161 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
+
     <div class="container mt-5" style="max-width:600px;">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h2 class="card-title mb-4 text-center">@ViewData["Title"]</h2>
 
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="alert alert-danger">
-                        @Html.ValidationSummary()
-                    </div>
-                }
+                <h2 class="card-title mb-4 text-center">@ViewData["Title"]</h2>
 
                 <form asp-action="CreateCar" method="post">
                     @Html.AntiForgeryToken()
 
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- PLAKA -->
                     <div class="mb-3">
                         <input asp-for="PlateNumber" class="form-control" placeholder="Plaka" />
                         <span asp-validation-for="PlateNumber" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
+                        <input asp-for="CarBrand" class="form-control" placeholder="Araç Markası" />
+                        <span asp-validation-for="CarBrand" class="text-danger small"></span>
+                    </div>
+
+                    <!-- MODEL -->
+                    <div class="mb-3">
                         <input asp-for="CarModel" class="form-control" placeholder="Araç Modeli" />
                         <span asp-validation-for="CarModel" class="text-danger small"></span>
                     </div>
+                    <div class="mb-3">
+                        <select asp-for="Type" class="form-select">
+                            <option value="">Araç Tipi Seçiniz</option>
+                            <option value="Hatchback">Hatchback</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="StationWagon">Station Wagon</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger small"></span>
+                    </div>
 
+                    <!-- YIL -->
                     <div class="mb-3">
                         <input asp-for="Year" type="number" class="form-control" placeholder="Model Yılı" />
                         <span asp-validation-for="Year" class="text-danger small"></span>
                     </div>
 
+                    <!-- KİLOMETRE -->
                     <div class="mb-3">
-                        <input asp-for="kilometer" type="number" class="form-control" placeholder="Kilometre" />
-                        <span asp-validation-for="kilometer" class="text-danger small"></span>
+                        <input asp-for="Kilometer" type="number" class="form-control" placeholder="Kilometre" />
+                        <span asp-validation-for="Kilometer" class="text-danger small"></span>
                     </div>
 
+                    <!-- DURUM -->
                     <div class="mb-3">
                         <select asp-for="Status" class="form-select">
-                            <option value="0">Mevcut</option> <!-- Available -->
-                            <option value="1">Kirada</option> <!-- Rented -->
-                            <option value="2">Bakımda</option> <!-- Maintenance -->
-
+                            <option value="">Durum Seçiniz</option>
+                            <option value="0">Müsait</option>
+                            <option value="1">Dolu</option>
+                            <option value="2">Bakımda</option>
                         </select>
                         <span asp-validation-for="Status" class="text-danger small"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-primary w-50">Araç Ekle</button>
-                        <a asp-action="GetCarAll" class="btn btn-outline-secondary w-45">Geri</a>
+                    <!-- HASAR VAR MI -->
+                    <div class="form-check mb-3">
+                        <input asp-for="HasDamage"
+                               class="form-check-input"
+                               type="checkbox"
+                               id="hasDamageCheckbox" />
+                        <label class="form-check-label" for="hasDamageCheckbox">
+                            Araçta hasar var mı?
+                        </label>
                     </div>
+
+                    <!-- HASAR ALANI -->
+                    <div id="damageArea" class="border rounded p-3 mb-3 d-none">
+
+                        <h6 class="mb-3">Hasar Bilgileri</h6>
+
+                        <div id="damageList"></div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                id="addDamageBtn">
+                            + Hasar Ekle
+                        </button>
+                    </div>
+
+                    <!-- BUTONLAR -->
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary w-50">
+                            Araç Ekle
+                        </button>
+                        <a asp-action="GetCarAll" class="btn btn-outline-secondary w-45">
+                            Geri
+                        </a>
+                    </div>
+
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- HASAR TEMPLATE -->
+    <script type="text/template" id="damageTemplate">
+        <div class="damage-item border rounded p-2 mb-2">
+
+            <div class="mb-2">
+                <select name="Damages[{index}].DamageType" class="form-select">
+                    <option value="">Hasar Türü</option>
+                    <option value="0">Değişen</option>
+                    <option value="1">Boyalı</option>
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <input name="Damages[{index}].Description"
+                       class="form-control"
+                       placeholder="Hasar Açıklaması" />
+            </div>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger remove-damage">
+                Sil
+            </button>
+        </div>
+    </script>
+
+    <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        let damageIndex = 0;
+
+        $('#hasDamageCheckbox').change(function () {
+            if (this.checked) {
+                $('#damageArea').removeClass('d-none');
+            } else {
+                $('#damageArea').addClass('d-none');
+                $('#damageList').empty();
+                damageIndex = 0;
+            }
+        });
+
+        $('#addDamageBtn').click(function () {
+            const template = $('#damageTemplate').html();
+            const html = template.replace(/{index}/g, damageIndex);
+            $('#damageList').append(html);
+            damageIndex++;
+        });
+
+        $(document).on('click', '.remove-damage', function () {
+            $(this).closest('.damage-item').remove();
+        });
+    </script>
+
 </body>
 </html>

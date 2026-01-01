@@ -67,22 +67,35 @@ namespace CarRentalEmployeeApp.Controllers
                 ModelState.AddModelError("PlateNumber", "Bu plakaya sahip bir araç zaten kayıtlı.");
                 return View(model);
             }
-
             var vehicle = new Vehicle
             {
                 PlateNumber = model.PlateNumber,
+                CarBrand = model.CarBrand,
                 CarModel = model.CarModel,
+                Type = model.Type,
                 Year = model.Year,
-                kilometer = model.kilometer,
+                kilometer = model.Kilometer,
                 Status = model.Status
             };
+
+            if (model.HasDamage && model.Damages.Any())
+            {
+                foreach (var damage in model.Damages)
+                {
+                    vehicle.Damages.Add(new VehicleDamage
+                    {
+                        DamageType = damage.DamageType,
+                        Description = damage.Description,
+                        ReportDate = DateTime.Now
+                    });
+                }
+            }
 
             _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("AdminDashboard", "Admin");
+            return RedirectToAction("GetCarAll");
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Updatecar(int id)
