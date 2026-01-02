@@ -1,21 +1,39 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using CarRentalEmployeeApp.Models;
 
 namespace CarRentalEmployeeApp.Models
 {
-    public enum VehicleStatus
+    public enum GearType
     {
-       
-            flexible= 0,
-            busy=1,
-            manintance =2,
+        [Display(Name = "Manuel")]
+        Manuel = 1,
+        [Display(Name = "Otomatik")]
+        Otomatik = 2,
+        [Display(Name = "Yarı Otomatik")]
+        YariOtomatik = 3
+
 
     }
+    public enum VehicleStatus
+    {
+        [Display(Name = "Müsait")]
+        Flexible = 0,
+
+        [Display(Name = "Dolu")]
+        Busy = 1,
+
+        [Display(Name = "Bakımda")]
+        Maintenance = 2
+    }
+
+
     public enum AssignmentStatus
     {
-        
+
         free,
-            appointed
+        appointed
 
     }
     [Index(nameof(PlateNumber), IsUnique = true)]
@@ -27,23 +45,23 @@ namespace CarRentalEmployeeApp.Models
         [Required(ErrorMessage = "Plaka zorunludur.")]
         [StringLength(10, ErrorMessage = "Plaka en fazla 10 karakter olabilir.")]
         public string PlateNumber { get; set; }
-        public string CarBrand { get; set;  }
+        public int BrandId { get; set; }
+        public Brand CarBrand { get; set; }
 
         [Required(ErrorMessage = "Araç modeli zorunludur.")]
         [StringLength(50, ErrorMessage = "Araç modeli en fazla 50 karakter olabilir.")]
-        public string CarModel { get; set; }
+        public string? CarModel { get; set; }
 
         [Range(1900, 2100, ErrorMessage = "Model yılı 1900 ile 2100 arasında olmalıdır.")]
-        public int Year { get; set; }
+        public int? Year { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Kilometre negatif olamaz.")]
-        public int kilometer { get; set; }
-        public string Type { get; set;  }
-     
+        public int? Kilometer { get; set; }
+        public string Type { get; set; }
 
+        public GearType GearType { get; set; }
 
-        [Required(ErrorMessage = "Durum seçilmelidir.")]
-        public VehicleStatus Status { get; set; } = VehicleStatus.flexible;
+        public VehicleStatus Status { get; set; } = VehicleStatus.Flexible;
 
         public AssignmentStatus AssignmentStatus { get; set; } = AssignmentStatus.free;
 
@@ -53,4 +71,5 @@ namespace CarRentalEmployeeApp.Models
 
         public virtual Employee? AssignedTo { get; set; }
     }
+
 }

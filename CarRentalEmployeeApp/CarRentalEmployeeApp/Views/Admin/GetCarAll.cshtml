@@ -31,6 +31,7 @@ else
                 <th>Marka</th>
                 <th>Model</th>
                 <th>Kilometre</th>
+                <th>Vites Türü</th>
                 <th>Sorumlu Kişi</th>
                 <th>Durum</th>
                 <th>İşlemler</th>
@@ -45,7 +46,8 @@ else
                     <td>@car.Year</td>
                     <td>@car.CarBrand</td>
                     <td>@car.CarModel</td> 
-                    <td>@car.kilometer</td>
+                    <td>@car.Kilometer</td>
+                    <td>@car.GearType</td>
                   
 
 
@@ -64,9 +66,9 @@ else
                         @{
                             string statusText = car.Status switch
                             {
-                                CarRentalEmployeeApp.Models.VehicleStatus.flexible => "Müsait",
-                                CarRentalEmployeeApp.Models.VehicleStatus.busy => "Kirada",
-                                CarRentalEmployeeApp.Models.VehicleStatus.manintance => "Bakımda",
+                                CarRentalEmployeeApp.Models.VehicleStatus.Flexible => "Müsait",
+                                CarRentalEmployeeApp.Models.VehicleStatus.Busy => "Kirada",
+                                CarRentalEmployeeApp.Models.VehicleStatus.Maintenance => "Bakımda",
                                 _ => "Bilinmiyor"
                             };
                         }

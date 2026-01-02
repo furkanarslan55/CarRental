@@ -1,5 +1,5 @@
 ﻿@model CarRentalEmployeeApp.ViewModels.CreateVehicleViewModel
-
+@using CarRentalEmployeeApp.Models
 @{
     ViewData["Title"] = "Yeni Araç Ekle";
 }
@@ -19,21 +19,25 @@
 
                 <h2 class="card-title mb-4 text-center">@ViewData["Title"]</h2>
 
-                <form asp-action="CreateCar" method="post">
+                <form asp-controller="Admin" asp-action="CreateCar" method="post">
+
                     @Html.AntiForgeryToken()
 
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
 
                     <!-- PLAKA -->
                     <div class="mb-3">
                         <input asp-for="PlateNumber" class="form-control" placeholder="Plaka" />
                         <span asp-validation-for="PlateNumber" class="text-danger small"></span>
                     </div>
-
+                    <!-- Marka -->
                     <div class="mb-3">
-                        <input asp-for="CarBrand" class="form-control" placeholder="Araç Markası" />
-                        <span asp-validation-for="CarBrand" class="text-danger small"></span>
+                        <select asp-for="BrandId" asp-items="Model.Brands" class="form-select">
+                            <option value="">Marka Seçiniz</option>
+                        </select>
+                        <span asp-validation-for="BrandId" class="text-danger"></span>
                     </div>
+
 
                     <!-- MODEL -->
                     <div class="mb-3">
@@ -61,17 +65,27 @@
                         <input asp-for="Kilometer" type="number" class="form-control" placeholder="Kilometre" />
                         <span asp-validation-for="Kilometer" class="text-danger small"></span>
                     </div>
-
-                    <!-- DURUM -->
                     <div class="mb-3">
-                        <select asp-for="Status" class="form-select">
-                            <option value="">Durum Seçiniz</option>
-                            <option value="0">Müsait</option>
-                            <option value="1">Dolu</option>
-                            <option value="2">Bakımda</option>
+                        <select asp-for="GearType"
+                                asp-items="Html.GetEnumSelectList<GearType>()"
+                                class="form-select">
+                            <option value="">Vites Seçiniz</option>
                         </select>
+
+                        <span asp-validation-for="GearType" class="text-danger small"></span>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<VehicleStatus>()"
+                                class="form-select">
+                            <option value="">Durum Seçiniz</option>
+                        </select>
+
                         <span asp-validation-for="Status" class="text-danger small"></span>
                     </div>
+
 
                     <!-- HASAR VAR MI -->
                     <div class="form-check mb-3">

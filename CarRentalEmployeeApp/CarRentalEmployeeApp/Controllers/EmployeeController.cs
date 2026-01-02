@@ -67,10 +67,10 @@ namespace CarRentalEmployeeApp.Controllers
                     .Where(v => v.AssignedToId == employee.Id)
                     .ToListAsync(),
                 RentedVehicles = await _context.Vehicles
-                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.busy)
+                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.Busy)
                     .ToListAsync(),
                 MaintenanceVehicles = await _context.Vehicles
-                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.manintance)
+                    .Where(v => v.AssignedToId == employee.Id && v.Status == VehicleStatus.Maintenance)
                     .ToListAsync()
 
 

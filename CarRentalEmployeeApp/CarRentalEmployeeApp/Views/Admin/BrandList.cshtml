@@ -1,0 +1,49 @@
+﻿@model List<CarRentalEmployeeApp.ViewModels.BrandListVM>
+
+
+
+
+@{
+    ViewData["Title"] = "Tüm Markalar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+
+<h2>Tüm Markalar</h2>
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Kayıtlı marka bulunamadı.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Marka Adı</th>
+                <th>Oluşturulma Tarihi</th>
+                <th>Araç Sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var brand in Model)
+            {
+                <tr>
+                    <td>@brand.Id</td>
+                    <td>@brand.Name</td>
+                    <td>@brand.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@brand.VehicleCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

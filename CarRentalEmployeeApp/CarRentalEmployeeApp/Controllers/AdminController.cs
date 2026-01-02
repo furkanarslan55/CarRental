@@ -4,7 +4,9 @@ using CarRentalEmployeeApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 namespace CarRentalEmployeeApp.Controllers
@@ -23,7 +25,9 @@ namespace CarRentalEmployeeApp.Controllers
         public async Task<IActionResult> GetCarAll()
         {
 
-            List<Vehicle> vehicles = await _context.Vehicles.Include(v=> v.AssignedTo).
+            List<Vehicle> vehicles = await _context.Vehicles.
+                Include(v => v.AssignedTo)
+                .Include(v => v.CarBrand).
                 ToListAsync();
 
             return View(vehicles);
@@ -40,11 +44,48 @@ namespace CarRentalEmployeeApp.Controllers
 
             return View(_id);
         }
-        [HttpGet]
 
-        public async Task<IActionResult> Createcar()
+        [HttpGet]
+        public async Task<IActionResult> CreateCar()
         {
-            return View();
+            LoadGearTypes();
+            var model = new CreateVehicleViewModel
+            {
+                Brands = LoadBrands()
+            };
+            return View(model);
+        }
+
+        // HELPER METOT
+        private void LoadGearTypes()
+        {
+            ViewBag.GearTypes = Enum.GetValues(typeof(GearType))
+                .Cast<GearType>()
+                .Select(x => new SelectListItem
+                {
+                    Text = x.ToString(),
+                    Value = ((int)x).ToString()
+                })
+                .ToList();
+        }
+        private List<SelectListItem> LoadBrands()
+        {
+            var brands = _context.Brands
+                .Select(b => new SelectListItem
+                {
+                    Value = b.Id.ToString(),
+                    Text = b.Name
+                })
+                .ToList();
+
+            // DEBUG için ekleyin
+            Console.WriteLine($"📋 {brands.Count} adet marka yüklendi");
+            foreach (var b in brands)
+            {
+                Console.WriteLine($"  - {b.Text} (ID: {b.Value})");
+            }
+
+            return brands;
         }
 
 
@@ -52,33 +93,54 @@ namespace CarRentalEmployeeApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCar(CreateVehicleViewModel model)
+
         {
+            Console.WriteLine("🔥 CREATECAR POST ÇALIŞTI");
+            Console.WriteLine($"📌 BrandId değeri: {model.BrandId}"); 
+
             if (!ModelState.IsValid)
             {
+                foreach (var entry in ModelState)
+                {
+                    foreach (var error in entry.Value.Errors)
+                    {
+                        Console.WriteLine($"{entry.Key} -> {error.ErrorMessage}");
+                    }
+                }
+
+                LoadGearTypes();
+                model.Brands = LoadBrands();
+
+
+
                 return View(model);
             }
 
-            // 🚨 AYNI PLAKA KONTROLÜ
             bool plateExists = await _context.Vehicles
                 .AnyAsync(v => v.PlateNumber == model.PlateNumber);
 
             if (plateExists)
             {
                 ModelState.AddModelError("PlateNumber", "Bu plakaya sahip bir araç zaten kayıtlı.");
+
+                LoadGearTypes();
+                model.Brands = LoadBrands();
                 return View(model);
             }
+
             var vehicle = new Vehicle
             {
                 PlateNumber = model.PlateNumber,
-                CarBrand = model.CarBrand,
+                BrandId = model.BrandId,
                 CarModel = model.CarModel,
                 Type = model.Type,
                 Year = model.Year,
-                kilometer = model.Kilometer,
+                Kilometer = model.Kilometer,
+                GearType = model.GearType,
                 Status = model.Status
             };
 
-            if (model.HasDamage && model.Damages.Any())
+            if (model.HasDamage && model.Damages != null && model.Damages.Any())
             {
                 foreach (var damage in model.Damages)
                 {
@@ -125,7 +187,7 @@ namespace CarRentalEmployeeApp.Controllers
             existingVehicle.PlateNumber = vehicle.PlateNumber;
             existingVehicle.CarModel = vehicle.CarModel;               // tek tek kontrol etmmemi sağlıyor 
             existingVehicle.Year = vehicle.Year;
-            existingVehicle.kilometer = vehicle.kilometer;
+            existingVehicle.Kilometer = vehicle.Kilometer;
             existingVehicle.Status = vehicle.Status;
             await _context.SaveChangesAsync();
             return RedirectToAction("GetCarAll");
@@ -134,16 +196,16 @@ namespace CarRentalEmployeeApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Deletecar(int Id)
         {
-            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(a => a.Id ==Id);
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(a => a.Id == Id);
             if (vehicle == null)
             {
                 return NotFound("ARAÇ BULUNAMADI");
             }
-            if(vehicle.AssignmentStatus == AssignmentStatus.appointed || vehicle.Status == VehicleStatus.busy)
+            if (vehicle.AssignmentStatus == AssignmentStatus.appointed || vehicle.Status == VehicleStatus.Busy)
             {
 
                 TempData["Error"] = "Araç silinemez";
-              return RedirectToAction("GetCarAll");
+                return RedirectToAction("GetCarAll");
             }
 
 
@@ -152,13 +214,68 @@ namespace CarRentalEmployeeApp.Controllers
             return RedirectToAction("GetCarAll");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CreateBrand()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateBrand(CreateBrandViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError("Name", "Marka adı boş olamaz.");
+                return View(model);
+            }
+
+            var normalizedName = model.Name.Trim();
+
+            bool brandExists = await _context.Brands
+                .AnyAsync(x => x.Name == normalizedName);
+
+            if (brandExists)
+            {
+                ModelState.AddModelError("Name", "Bu marka zaten mevcut.");
+                return View(model);
+            }
+
+            var brand = new Brand
+            {
+                Name = normalizedName
+            };
+
+            _context.Brands.Add(brand);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("GetCarAll");
+        }
+
+        public async Task<IActionResult> BrandList()  //tüm araçları include etmektense n+1 problemi yaşamamak için sadece count bilgisini alıyorum
+        {
+            var model = _context.Brands
+        .Select(b => new BrandListVM
+        {
+            Id = b.Id,
+            Name = b.Name,
+            CreatedDate = b.CreatedDate,
+            VehicleCount = b.Vehicles.Count()
+        })
+        .ToList();
+
+            return View(model);
+        }
+
 
         public async Task<IActionResult> AdminDashboard()
         {
             var totalVehicles = await _context.Vehicles.CountAsync();
-            var rentedVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.busy);
-            var availableVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.flexible);
-            var maintenanceVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.manintance);
+            var rentedVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Busy);
+            var availableVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Flexible);
+            var maintenanceVehicles = await _context.Vehicles.CountAsync(v => v.Status == VehicleStatus.Maintenance);
             var totalEmployees = await _context.Employee.CountAsync();
 
             var employees = await _context.Employee.ToListAsync();
@@ -178,7 +295,7 @@ namespace CarRentalEmployeeApp.Controllers
             return View(dashboardData);
         }
 
-        
+
         public async Task<IActionResult> GetEmploye()
 
         {
@@ -189,8 +306,8 @@ namespace CarRentalEmployeeApp.Controllers
                 Name = e.Name,
                 Surname = e.Surname,
                 Email = e.Email,
-               PhoneNumber = e.PhoneNumber
-           
+                PhoneNumber = e.PhoneNumber
+
             }).ToList();
 
             return View(model);
@@ -223,10 +340,10 @@ namespace CarRentalEmployeeApp.Controllers
                 Address = model.Address,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-          
+
             };
             var result = await _userManager.CreateAsync(user, model.Password);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, "Employee");
             }
@@ -251,7 +368,7 @@ namespace CarRentalEmployeeApp.Controllers
             }
             var model = new UpdateEmployeViewModel
             {
-               
+
                 Name = updateemploye.Name,
                 Surname = updateemploye.Surname,
                 Email = updateemploye.Email,
@@ -277,7 +394,7 @@ namespace CarRentalEmployeeApp.Controllers
                 return View(model);
 
             }
-      
+
 
 
             employe.Name = model.Name;
@@ -285,7 +402,7 @@ namespace CarRentalEmployeeApp.Controllers
             employe.Email = model.Email;
             employe.PhoneNumber = model.PhoneNumber;
             employe.Address = model.Address;
-        
+
 
 
             await _context.SaveChangesAsync();
@@ -324,7 +441,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
 
-            
+
         }
 
 

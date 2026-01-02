@@ -22,6 +22,30 @@ namespace CarRentalEmployeeApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CarRentalEmployeeApp.Models.Brand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+                });
+
             modelBuilder.Entity("CarRentalEmployeeApp.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -201,18 +225,19 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Property<int>("AssignmentStatus")
                         .HasColumnType("int");
 
-                    b.Property<string>("CarBrand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CarModel")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("GearType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("GearType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Kilometer")
+                        .HasColumnType("int");
 
                     b.Property<string>("PlateNumber")
                         .IsRequired()
@@ -229,12 +254,11 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
-                    b.Property<int>("kilometer")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
+
+                    b.HasIndex("BrandId");
 
                     b.HasIndex("PlateNumber")
                         .IsUnique();
@@ -447,7 +471,15 @@ namespace CarRentalEmployeeApp.Migrations
                         .WithMany("AssignedVehicles")
                         .HasForeignKey("AssignedToId");
 
+                    b.HasOne("CarRentalEmployeeApp.Models.Brand", "CarBrand")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AssignedTo");
+
+                    b.Navigation("CarBrand");
                 });
 
             modelBuilder.Entity("CarRentalEmployeeApp.Models.VehicleDamage", b =>
@@ -510,6 +542,11 @@ namespace CarRentalEmployeeApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CarRentalEmployeeApp.Models.Brand", b =>
+                {
+                    b.Navigation("Vehicles");
                 });
 
             modelBuilder.Entity("CarRentalEmployeeApp.Models.Customer", b =>

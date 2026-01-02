@@ -33,7 +33,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
             var assignedVehicles = await _context.Vehicles
-                .Where(v => v.AssignedToId == employee.Id && v.Status ==VehicleStatus.flexible)
+                .Where(v => v.AssignedToId == employee.Id && v.Status ==VehicleStatus.Flexible)
                 .ToListAsync();
 
 
@@ -52,7 +52,7 @@ namespace CarRentalEmployeeApp.Controllers
                 return RedirectToAction("Login", "Account");
             }
             var vehicle = await _context.Vehicles.FindAsync(id);
-            if (vehicle == null || vehicle.AssignedToId != employee.Id || vehicle.Status != VehicleStatus.flexible)
+            if (vehicle == null || vehicle.AssignedToId != employee.Id || vehicle.Status != VehicleStatus.Flexible)
             {
                 return NotFound();
             }
@@ -62,8 +62,8 @@ namespace CarRentalEmployeeApp.Controllers
                 VehicleId = vehicle.Id,
                 PlateNumber = vehicle.PlateNumber,
                 CarModel = vehicle.CarModel,
-                Year = vehicle.Year,
-                Kilometer = vehicle.kilometer
+                Year = vehicle.Year!.Value,
+                Kilometer = vehicle.Kilometer!.Value
 
 
 
@@ -89,7 +89,7 @@ namespace CarRentalEmployeeApp.Controllers
             var vehicle = await _context.Vehicles.FindAsync(model.VehicleId);
             if (vehicle == null ||
                vehicle.AssignedToId != employee.Id ||
-               vehicle.Status != VehicleStatus.flexible)
+               vehicle.Status != VehicleStatus.Flexible)
             {
                 return View("Rent",model);
             }
@@ -107,7 +107,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
 
-            vehicle.Status = VehicleStatus.busy;
+            vehicle.Status = VehicleStatus.Busy;
 
             _context.Rentals.Add(rental);
             _context.Vehicles.Update(vehicle);

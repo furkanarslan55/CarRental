@@ -1,35 +1,40 @@
 ﻿using CarRentalEmployeeApp.Models;
+using CarRentalEmployeeApp.ViewModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace CarRentalEmployeeApp.ViewModels
 {
     public class CreateVehicleViewModel
     {
-        [Required(ErrorMessage = "Plaka numarası zorunludur")]
-        [StringLength(10, ErrorMessage = "En fazla 10 karakter olmalıdır")]
-        [Display(Name = "Plaka Numarası")]
+        [Required]
         public string PlateNumber { get; set; }
 
-        [Required(ErrorMessage = "Model alanı zorunludur")]
-        [Display(Name = "Araç Modeli")]
+        [Required]
         public string CarModel { get; set; }
-        public string CarBrand { get; set; }
+
+        [Required(ErrorMessage = "Marka seçilmelidir")]
+        public int BrandId { get; set; }
+        [ValidateNever]
+        public List<SelectListItem> Brands { get; set; }
+
+        [Required(ErrorMessage = "Araç türü zorunludur")]
         public string Type { get; set; }
 
-        [Range(1900, 2100, ErrorMessage = "Geçerli bir yıl girin.")]
+        public GearType GearType { get; set; }
+
+        [Range(1900, 2100)]
         public int Year { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "Kilometre sıfırdan küçük olamaz.")]
+        [Range(0, int.MaxValue)]
         public int Kilometer { get; set; }
 
-        [Range(0, int.MaxValue, ErrorMessage = "Araç durumu seçilmelidir")]
         public VehicleStatus Status { get; set; }
 
-        // HASAR VAR MI?
         public bool HasDamage { get; set; }
 
-        // HASAR LİSTESİ
-        public List<CreateVehicleDamageViewModel> Damages { get; set; }
-            = new List<CreateVehicleDamageViewModel>();
+        public List<CreateVehicleDamageViewModel> Damages { get; set; } = new();
     }
+
 }

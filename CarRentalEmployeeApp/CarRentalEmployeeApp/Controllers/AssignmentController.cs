@@ -42,7 +42,7 @@ namespace CarRentalEmployeeApp.Controllers
                 VehicleId = car.Id,
                 PlateNumber = car.PlateNumber,
                 CarModel = car.CarModel,
-                Year = car.Year,
+                Year = car.Year!.Value,
                 EmployeName = await _context.Employee.ToListAsync(),
                 Created = DateTime.Now
 
