@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace CarRentalEmployeeApp.Models
 
@@ -13,11 +14,13 @@ namespace CarRentalEmployeeApp.Models
         public string Address { get; set; }
 
         public ICollection<Rental> Rentals { get; set; }
-        public string EmployeeId { get; set; }
+        public string? EmployeeId { get; set; }
         
         public Employee Employee { get; set; }
-       
+        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
 
-        
+
+
     }
 }

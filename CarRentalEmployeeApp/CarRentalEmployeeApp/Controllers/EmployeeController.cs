@@ -38,7 +38,7 @@ namespace CarRentalEmployeeApp.Controllers
             var employee = await _userManager.GetUserAsync(User); //employe içindeki ıd yi alıyoruz
 
 
-            var customers = _context.customers
+            var customers = _context.Customers
                 .Where(c => c.EmployeeId == employee.Id)
                 .ToList();
        
@@ -106,7 +106,7 @@ namespace CarRentalEmployeeApp.Controllers
                 EmployeeId = employee.Id
             };
 
-            _context.customers.Add(createcustomer);
+            _context.Customers.Add(createcustomer);
 
             await _context.SaveChangesAsync();
 
@@ -124,7 +124,7 @@ namespace CarRentalEmployeeApp.Controllers
             if (employee == null)
                 return Unauthorized();
 
-            var customer = await _context.customers
+            var customer = await _context.Customers
                 .FirstOrDefaultAsync(c => c.EmployeeId == employee.Id && c.Id == id);
 
             if (customer == null)
@@ -144,7 +144,7 @@ namespace CarRentalEmployeeApp.Controllers
 
             var employee = await _userManager.GetUserAsync(User);
 
-            var existingCustomer = await _context.customers
+            var existingCustomer = await _context.Customers
                 .FirstOrDefaultAsync(x => x.Id == customers.Id && x.EmployeeId == employee.Id);
 
             if (existingCustomer == null)

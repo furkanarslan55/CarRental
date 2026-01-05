@@ -1,0 +1,67 @@
+﻿@model List<CarRentalEmployeeApp.ViewModels.CustomerViewModel>
+@{
+    ViewData["Title"] = "Tüm Müşteriler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Tüm Müşteriler</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Kayıtlı müşteri bulunamadı.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ad</th>
+                <th>Soyad</th>
+                <th>Email</th>
+                <th>Telefon</th>
+                <th>İşlemler</th>
+              
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Model)
+            {
+                <tr>
+                    <td>@customer.Id</td>
+                    <td>@customer.Name</td>
+                    <td>@customer.Surname</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.PhoneNumber</td>
+                    <td>
+                        <a asp-action="DetailsCustomer"
+                           asp-route-id="@customer.Id"
+                           class="btn btn-info btn-sm">
+                            Detay
+                        </a>
+
+                        <a asp-action="UpdateCustomer"
+                           asp-route-id="@customer.Id"
+                           class="btn btn-warning btn-sm">
+                            Düzenle
+                        </a>
+
+                        <!-- DELETE FORM -->
+                        <form asp-action="DeleteCustomer"
+                              asp-route-id="@customer.Id"
+                              method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Sil
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

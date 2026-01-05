@@ -9,7 +9,7 @@ namespace CarRentalEmployeeApp.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<Employee> _signInManager;  // kullanıcı girişi için
-        private readonly UserManager<Employee> _userManager;
+        private readonly UserManager<Employee> _userManager; // kullanıcı yönetimi için
         public AccountController(SignInManager<Employee> signInManager, UserManager<Employee> userManager)
         {
             _signInManager = signInManager;

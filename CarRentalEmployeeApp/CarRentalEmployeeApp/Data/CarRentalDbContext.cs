@@ -10,7 +10,7 @@ namespace CarRentalEmployeeApp.Data
 {
     public class CarRentalDbContext:  IdentityDbContext<Employee>
     {
-        public DbSet<Customer> customers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
   
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Employee> Employee { get; set; }

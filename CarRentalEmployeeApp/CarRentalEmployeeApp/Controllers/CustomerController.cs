@@ -1,0 +1,232 @@
+﻿using CarRentalEmployeeApp.Data;
+using CarRentalEmployeeApp.Models;
+using CarRentalEmployeeApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace CarRentalEmployeeApp.Controllers
+{
+    [Authorize(Roles = "Admin,Employee")]
+    public class CustomerController : Controller
+    {
+        private readonly UserManager<Employee> _userManager;
+        private readonly CarRentalDbContext _context;
+        public CustomerController(UserManager<Employee> userManager, CarRentalDbContext context)   // dependency injection
+        {
+            _userManager = userManager;
+            _context = context;
+        }
+
+
+
+
+
+
+        [HttpGet]
+        public IActionResult CreateCustomer()
+        {
+            return View();
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCustomer(CustomerCreateViewModel model)
+        {
+
+
+            if (!ModelState.IsValid)
+            {
+
+                return View(model);
+            }
+            var users = await _userManager.GetUserAsync(User); // modelden sonra kontrol etmek daha mantıklı boş yere kulllanıcıyı çekmemize gerek yok
+
+
+
+            var customer = new Customer
+            {
+                Name = model.Name,
+                Surname = model.Surname,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                Address = model.Address,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = users.UserName
+
+
+
+            };
+            _context.Customers.Add(customer);
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction(nameof(GetCustomerAll));
+        }
+
+        public async Task<IActionResult> GetCustomerAll()
+        {
+            // Veritabanından veriyi çekerken aynı anda ViewModel'e dönüştürüyoruz.
+            var model = await _context.Customers.Include(a=> a.Employee)
+                .Select(x => new CustomerViewModel
+                {
+
+                    Id = x.Id,
+                    Name = x.Name,
+                    Surname = x.Surname,
+                    Email = x.Email,
+                    Address =x.Address,
+                    PhoneNumber = x.PhoneNumber,
+                    CreatedAt = x.CreatedAt,
+                    CreatedBy = x.CreatedBy,
+                    EmployeeName = x.Employee != null ? x.Employee.Name + " " + x.Employee.Surname : null, 
+
+
+
+
+                }).ToListAsync();
+
+
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCustomer(int Id)
+        {
+            var exictingcustomer = await _context.Customers.FindAsync(Id);
+            if (exictingcustomer == null) {
+
+
+                return View(exictingcustomer);
+            
+            
+            }
+        _context.Customers.Remove(exictingcustomer);
+            _context.SaveChanges();
+            return RedirectToAction("GetCustomerAll");
+       
+
+
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateCustomer(int Id)
+        {
+            var exictingcustomer =await _context.Customers.FindAsync(Id); // find methodu primary key ile arama yapar.FirstOrDefault a göre daha hızlıdır.
+
+            if (exictingcustomer == null)
+            {
+
+
+                return NotFound("Müşteri bulunamadı");
+
+
+            }
+            var model = new CustomerUpdateViewModel
+            {
+              Id = exictingcustomer.Id,
+                Name = exictingcustomer.Name,
+                Surname = exictingcustomer.Surname,
+                Email = exictingcustomer.Email,
+                Address = exictingcustomer.Address,
+                PhoneNumber = exictingcustomer.PhoneNumber,
+                EmployeeId = exictingcustomer.EmployeeId,
+            };
+
+            return View(model);
+
+
+
+
+
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCustomer(CustomerUpdateViewModel model)
+
+
+        {
+            var user = await _context.Customers.FirstOrDefaultAsync(u => u.Id == model.Id);
+            if (user == null) {
+
+
+                return NotFound("Kullanıcı Bulunamadı");
+
+
+
+            }
+
+            user.Name = model.Name;
+            user.Surname = model.Surname;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+        user.EmployeeId = model.EmployeeId;
+
+
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("GetCustomerAll");
+
+
+
+                }
+
+
+
+
+        public async Task<IActionResult> DetailsCustomer(int id)
+        {
+
+
+            var exictingcustomer = _context.Customers.Include(c=>c.Employee).
+                FirstOrDefault(x => x.Id == id);
+            if (exictingcustomer == null)
+            {
+
+
+                return View(exictingcustomer);
+
+
+            }
+
+            var model = new CustomerViewModel
+            {
+                Id = exictingcustomer.Id,
+                Name = exictingcustomer.Name,
+                Surname = exictingcustomer.Surname,
+                Email = exictingcustomer.Email,
+                Address = exictingcustomer.Address,
+                PhoneNumber = exictingcustomer.PhoneNumber,
+                CreatedAt = exictingcustomer.CreatedAt,
+                CreatedBy = exictingcustomer.CreatedBy,
+                EmployeeId = exictingcustomer.EmployeeId
+
+
+
+
+
+            };
+
+            return View(model);
+
+
+
+
+
+
+
+
+        }
+
+
+
+    }
+}

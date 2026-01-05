@@ -1,0 +1,63 @@
+﻿@model CarRentalEmployeeApp.ViewModels.CustomerCreateViewModel
+
+
+@{
+    ViewData["Title"] = "Create Customer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0"> Yeni Müşteri Ekle</h4>
+                </div>
+
+                <div class="card-body p-4">
+                
+                    <form asp-action="CreateCustomer" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ad</label>
+                                <input asp-for="Name" class="form-control" placeholder="Ad giriniz" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Soyad</label>
+                                <input asp-for="Surname" class="form-control" placeholder="Soyad giriniz" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Adres</label>
+                                <input asp-for="Address" class="form-control" placeholder="Adres giriniz" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="ornek@mail.com" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Telefon</label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="05xx xxx xx xx" />
+                            </div>
+
+                         
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                                Kaydet
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model CarRentalEmployeeApp.ViewModels.CustomerViewModel
+@{
+    ViewData["Title"] = "Müşteri Detayları";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Müşteri Bilgileri</strong>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">ID</label>
+                <input class="form-control" value="@Model.Id" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ad</label>
+                <input class="form-control" value="@Model.Name" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Soyad</label>
+                <input class="form-control" value="@Model.Surname" readonly />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" value="@Model.Email" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Telefon</label>
+                <input class="form-control" value="@Model.PhoneNumber" readonly />
+
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Kayıt Tarihi</label>
+                <input class="form-control" value="@Model.CreatedAt" readonly />
+
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Adres</label>
+                <input class="form-control" value="@Model.Address" readonly />
+
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Kayıt Sorumlusu</label>
+                <input class="form-control" value="@Model.CreatedBy" readonly />
+
+            </div>
+        </div>
+    </div>
+</div>

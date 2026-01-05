@@ -1,0 +1,47 @@
+﻿@model CarRentalEmployeeApp.ViewModels.CustomerUpdateViewModel
+
+@{
+    ViewData["Title"] = "Müşteri Güncelle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Müşteri Güncelle</h2>
+
+
+<form asp-action="UpdateCustomer" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Ad</label>
+        <input asp-for="Name" class="form-control" placeholder="Ad giriniz" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Surname" class="form-label">Soyad</label>
+        <input asp-for="Surname" class="form-control" placeholder="Soyad giriniz" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" type="email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="PhoneNumber" class="form-label">Email</label>
+        <input asp-for="PhoneNumber" type="number" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Email</label>
+        <input asp-for="Address" type="text" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Email</label>
+        <input asp-for="Address" type="text" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="EmployeeId" class="form-label">Sorumlu</label>
+        <input asp-for="EmployeeId" type="text" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a asp-action="GetCustomerAll" class="btn btn-secondary">Geri Gel</a>
+
+
+
+    </form>
