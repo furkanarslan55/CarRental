@@ -78,7 +78,7 @@ namespace CarRentalEmployeeApp.Controllers
                 })
                 .ToList();
 
-            // DEBUG için ekleyin
+       
             Console.WriteLine($"📋 {brands.Count} adet marka yüklendi");
             foreach (var b in brands)
             {

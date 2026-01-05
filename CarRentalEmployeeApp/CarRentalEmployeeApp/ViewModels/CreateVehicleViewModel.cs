@@ -16,7 +16,7 @@ namespace CarRentalEmployeeApp.ViewModels
 
         [Required(ErrorMessage = "Marka seçilmelidir")]
         public int BrandId { get; set; }
-        [ValidateNever]
+        [ValidateNever] // KULLANICIDAN MANUEL VERİ ALMADIĞIM İÇİN MODELSTATE TARAFINDA KONTOL EDİLMESİNİ ÖNLEMEK İÇİN KULLANILIR
         public List<SelectListItem> Brands { get; set; }
 
         [Required(ErrorMessage = "Araç türü zorunludur")]
