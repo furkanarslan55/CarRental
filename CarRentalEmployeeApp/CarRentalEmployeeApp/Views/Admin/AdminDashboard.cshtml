@@ -2,170 +2,281 @@
 @{
     ViewData["Title"] = "Yönetim Paneli";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Razor tarafında anlık hesaplamalar (Modeli bozmadan ekstra veri üretimi)
+    var totalVehicles = Model.Vehicles.Count;
+    var busyVehicles = Model.Vehicles.Count(x => x.Status == VehicleStatus.Busy);
+    var availableVehicles = Model.Vehicles.Count(x => x.Status == VehicleStatus.Flexible);
+    var maintenanceVehicles = Model.Vehicles.Count(x => x.Status == VehicleStatus.Maintenance);
+
+    // Doluluk oranı hesabı
+    var occupancyRate = totalVehicles > 0 ? (int)((double)busyVehicles / totalVehicles * 100) : 0;
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-    .stat-card {
-        border-radius: 18px;
-        border: none;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-        transition: 0.3s;
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f6f9;
     }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    /* Kart Tasarımları */
+    .dashboard-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        transition: all 0.2s ease;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
         }
 
-    .icon-box {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
-        font-size: 20px;
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.25rem;
     }
 
-    .table-card {
-        border-radius: 16px;
-        overflow: hidden;
+    /* Tablo Tasarımı */
+    .custom-table thead th {
+        background-color: #1e293b; /* Koyu Lacivert Başlık */
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         border: none;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
-    }
-
-        .table-card .card-header {
-            background: #fff;
-            padding: 15px 20px;
-            font-weight: 600;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-    table thead {
-        background: #f8f9fa;
-        font-weight: 600;
-    }
-
-    table tbody tr:hover {
-        background: #f3f6fb;
-        cursor: pointer;
-    }
-
-    .list-group-item {
         padding: 12px 16px;
-        font-size: 15px;
-        border-left: 0;
-        border-right: 0;
     }
 
-        .list-group-item:hover {
-            background: #f3f6fb;
+        .custom-table thead th:first-child {
+            border-top-left-radius: 8px;
         }
+
+        .custom-table thead th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+    .custom-table tbody td {
+        vertical-align: middle;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+        color: #334155;
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Status Dot (Durum Noktası) */
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    .progress-thin {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e2e8f0;
+    }
 </style>
 
+<div class="container-fluid py-4 px-4">
 
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Genel Bakış</h3>
+            <p class="text-muted small mb-0">Hoşgeldiniz, sistem verileri günceldir.</p>
+        </div>
+        <div class="d-none d-md-block">
+            <span class="bg-white border px-3 py-2 rounded-3 text-muted small shadow-sm">
+                <i class="fa-regular fa-calendar me-2"></i> @DateTime.Now.ToString("dd MMMM yyyy, dddd")
+            </span>
+        </div>
+    </div>
 
+    <div class="row g-4 mb-4">
 
-
-<!-- STAT KARTLARI -->
-<div class="row g-3 mb-4">
-
-    <div class="col-md-3">
-        <div class="card stat-card p-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <p class="text-muted small fw-bold mb-1">Toplam Personel</p>
-                    <h3 class="fw-bold m-0">@Model.TotalEmployees</h3>
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Toplam Filo</p>
+                        <h2 class="fw-bold text-dark mb-0">@totalVehicles</h2>
+                    </div>
+                    <div class="icon-shape bg-primary text-white shadow-sm">
+                        <i class="fa-solid fa-car"></i>
+                    </div>
                 </div>
-                <div class="icon-box bg-primary bg-opacity-10 text-primary">
-                    <i class="fa-solid fa-users"></i>
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                        <span>Doluluk Oranı</span>
+                        <span>%@occupancyRate</span>
+                    </div>
+                    <div class="progress progress-thin">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: @occupancyRate%"></div>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4 h-100 border-start border-4 border-warning">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Kiradaki Araçlar</p>
+                        <h2 class="fw-bold text-dark mb-0">@busyVehicles</h2>
+                    </div>
+                    <div class="icon-shape bg-warning bg-opacity-10 text-warning">
+                        <i class="fa-solid fa-road"></i>
+                    </div>
+                </div>
+                <small class="text-muted mt-3 d-block"><i class="fa-solid fa-arrow-up text-success me-1"></i>Aktif kiralamalar</small>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4 h-100 border-start border-4 border-success">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Müsait Araçlar</p>
+                        <h2 class="fw-bold text-dark mb-0">@availableVehicles</h2>
+                    </div>
+                    <div class="icon-shape bg-success bg-opacity-10 text-success">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+                <small class="text-muted mt-3 d-block"><i class="fa-solid fa-bolt text-success me-1"></i>Hemen atanabilir</small>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase small fw-bold mb-1">Personel Sayısı</p>
+                        <h2 class="fw-bold text-dark mb-0">@Model.TotalEmployees</h2>
+                    </div>
+                    <div class="icon-shape bg-dark text-white shadow-sm">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+                <small class="text-muted mt-3 d-block">İK Yönetimi</small>
             </div>
         </div>
     </div>
 
-</div>
+    <div class="row g-4">
 
+        <div class="col-lg-8">
+            <div class="dashboard-card h-100">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold text-dark mb-0">Araç Durum Raporu</h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Sırala: Tümü
+                        </button>
+                    </div>
+                </div>
 
-<!-- TABLO VE PERSONEL LİSTESİ -->
-<div class="row">
-
-    <!-- Araç Durum Tablosu -->
-    <div class="col-lg-8 mb-4">
-        <div class="card table-card h-100">
-            <div class="card-header">
-                <i class="fa-solid fa-car me-2 text-primary"></i>
-                Araç Durum Listesi
-            </div>
-
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Plaka</th>
-                            <th>Model</th>
-                            <th>Durum</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var vehicle in Model.Vehicles)
-                        {
+                <div class="table-responsive p-3">
+                    <table class="table custom-table table-hover mb-0">
+                        <thead>
                             <tr>
-                                <td>@vehicle.PlateNumber</td>
-                                <td>@vehicle.CarModel</td>
-                                <td>
-                                    @switch (vehicle.Status)
-                                    {
-                                        case VehicleStatus.Flexible:
-                                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">
-                                                <i class="fa-solid fa-check-circle me-1"></i> Mevcut
-                                            </span>
-                                            break;
-
-                                        case VehicleStatus.Busy:
-                                            <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2">
-                                                <i class="fa-solid fa-clock me-1"></i> Kirada
-                                            </span>
-                                            break;
-
-                                        case VehicleStatus.Maintenance:
-                                            <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2">
-                                                <i class="fa-solid fa-screwdriver-wrench me-1"></i> Bakımda
-                                            </span>
-                                            break;
-                                    }
-                                </td>
+                                <th>Araç Modeli</th>
+                                <th>Plaka</th>
+                                <th>Son Durum</th>
+                                <th class="text-end">İşlem</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var vehicle in Model.Vehicles.Take(7))
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 me-3">
+                                                <i class="fa-solid fa-car text-secondary"></i>
+                                            </div>
+                                            <span class="fw-bold text-dark">@vehicle.CarModel</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="font-monospace text-secondary">@vehicle.PlateNumber</span>
+                                    </td>
+                                    <td>
+                                        @switch (vehicle.Status)
+                                        {
+                                            case VehicleStatus.Flexible:
+                                                <span class="text-success fw-medium small"><span class="status-dot bg-success"></span>Müsait</span>
+                                                break;
+                                            case VehicleStatus.Busy:
+                                                <span class="text-warning fw-medium small"><span class="status-dot bg-warning"></span>Kirada</span>
+                                                break;
+                                            case VehicleStatus.Maintenance:
+                                                <span class="text-danger fw-medium small"><span class="status-dot bg-danger"></span>Bakımda</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="/Car/Details/@vehicle.Id" class="btn btn-light btn-sm text-secondary"><i class="fa-solid fa-ellipsis"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 border-top text-center">
+                    <a href="/Car/Index" class="text-decoration-none small fw-bold text-primary">Tüm Araçları İncele <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="dashboard-card h-100">
+                <div class="p-4 border-bottom">
+                    <h6 class="fw-bold text-dark mb-0">Son Eklenen Personeller</h6>
+                </div>
+                <div class="p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var emp in Model.Employees.Take(6))
+                        {
+                            <li class="list-group-item p-3 border-0 border-bottom d-flex align-items-center">
+                                <div class="position-relative">
+                                    <div class="rounded-3 bg-dark text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 42px; height: 42px;">
+                                        @(emp.Name.Substring(0, 1))@(emp.Surname.Substring(0, 1))
+                                    </div>
+                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle"></span>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 text-dark fw-bold small">@emp.Name @emp.Surname</h6>
+                                    <span class="text-muted small">Personel ID: #@emp.Id</span>
+                                </div>
+
+                                <a href="/Employee/Details/@emp.Id" class="btn btn-sm btn-outline-light text-secondary border">
+                                    <i class="fa-regular fa-id-card"></i>
+                                </a>
+                            </li>
                         }
-                    </tbody>
-
-                </table>
+                    </ul>
+                </div>
             </div>
         </div>
+
     </div>
-
-
-    <!-- Personel Listesi -->
-    <div class="col-lg-4 mb-4">
-        <div class="card table-card h-100">
-            <div class="card-header">
-                <i class="fa-solid fa-users me-2 text-primary"></i>
-                Personel Listesi
-            </div>
-
-            <div class="card-body p-0">
-                <ul class="list-group list-group-flush">
-                    @foreach (var emp in Model.Employees.Take(5))
-                    {
-                        <li class="list-group-item d-flex align-items-center">
-                            <i class="fa-solid fa-user text-secondary me-3"></i>
-                            @emp.Name @emp.Surname
-                        </li>
-                    }
-                </ul>
-            </div>
-        </div>
-    </div>
-
 </div>

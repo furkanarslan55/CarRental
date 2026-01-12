@@ -1,49 +1,84 @@
 ﻿@model CarRentalEmployeeApp.ViewModels.AssignmentToEmployeeView
 
 @{
-    ViewData["Title"] = "Araç Çalışana Atama";
+    ViewData["Title"] = "Zimmet Atama";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Araç Çalışana Atama</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
 
-<hr />
+            <div class="text-center mb-4">
+                <h4 class="fw-bold text-dark">Araç Zimmetleme</h4>
+                <p class="text-muted small">Seçilen aracı bir personele atamak üzeresiniz.</p>
+            </div>
 
-<!-- Araç Bilgileri -->
-<div class="card mb-3">
-    <div class="card-header">
-        Araç Bilgileri
-    </div>
-    <div class="card-body">
-        <p><strong>Plaka:</strong> @Model.PlateNumber</p>
-        <p><strong>Model:</strong> @Model.CarModel</p>
-        <p><strong>Yıl:</strong> @Model.Year</p>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="bg-light bg-opacity-50 border border-secondary border-opacity-10 rounded-3 p-3 mb-4 d-flex align-items-center">
+
+                        <div class="rounded-circle bg-white shadow-sm text-primary d-flex justify-content-center align-items-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold text-dark mb-0">@Model.CarModel</h6>
+                            <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i>@Model.Year Model</small>
+                        </div>
+
+                        <div class="text-end">
+                            <span class="badge bg-dark text-white font-monospace fs-6 shadow-sm px-3 py-2 rounded-1">
+                                @Model.PlateNumber
+                            </span>
+                        </div>
+                    </div>
+
+                    <form asp-action="AssignCarToEmployee" method="post">
+
+                        <input type="hidden" asp-for="VehicleId" />
+                        <input type="hidden" asp-for="Created" />
+
+                        <div class="mb-4">
+                            <label class="form-label fw-medium text-secondary small text-uppercase">Zimmetlenecek Personel</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 border-secondary border-opacity-25 text-muted">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </span>
+                                <select asp-for="SelectedEmployeeId" class="form-select form-select-lg border-start-0 border-secondary border-opacity-25 fs-6 shadow-none" style="border-left:none;">
+                                    <option value="">Personel Seçiniz...</option>
+                                    @foreach (var employee in Model.EmployeName)
+                                    {
+                                        <option value="@employee.Id">
+                                            @employee.Name @employee.Surname
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-text text-muted small mt-2">
+                                <i class="fa-solid fa-circle-info me-1"></i>
+                                Seçilen personelin aktif bir zimmeti olup olmadığını kontrol ediniz.
+                            </div>
+                        </div>
+
+                        <hr class="border-secondary border-opacity-10 my-4">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-2 shadow-sm fw-medium">
+                                <i class="fa-solid fa-key me-2"></i>Atamayı Tamamla
+                            </button>
+
+                            <a asp-action="AssignmentToCar" class="btn btn-light btn-lg rounded-2 text-muted fw-medium border-0">
+                                İptal Et ve Dön
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
-
-<!-- Atama Formu -->
-<form asp-action="AssignCarToEmployee" method="post">
-    <input type="hidden" asp-for="VehicleId" />
-    <input type="hidden" asp-for="Created" />
-
-    <div class="mb-3">
-        <label class="form-label">Çalışan Seç</label>
-        <select asp-for="SelectedEmployeeId" class="form-select">
-            <option value="">-- Çalışan Seçiniz --</option>
-            @foreach (var employee in Model.EmployeName)
-            {
-                <option value="@employee.Id">
-                    @employee.Name @employee.Surname
-                </option>
-            }
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Araç Ata
-    </button>
-
-    <a asp-action="AssignmentToCar" class="btn btn-secondary">
-        Geri Dön
-    </a>
-</form>

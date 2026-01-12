@@ -164,37 +164,74 @@ namespace CarRentalEmployeeApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Updatecar(int id)
         {
-            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
+            var vehicle = await _context.Vehicles
+                .Include(v => v.Damages)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
             if (vehicle == null)
-            {
                 return NotFound("ARAÇ BULUNAMADI");
-            }
-            return View(vehicle);
 
+            var model = new UpdateCarViewModel
+            {
+                Id = vehicle.Id,
+                PlateNumber = vehicle.PlateNumber,
+                BrandId = vehicle.BrandId,
+                CarModel = vehicle.CarModel,
+                Year = vehicle.Year,
+                Kilometer = vehicle.Kilometer,
+                Type = vehicle.Type,
+                GearType = vehicle.GearType,
+                Status = vehicle.Status,
+                AssignmentStatus = vehicle.AssignmentStatus,
+                AssignedToId = vehicle.AssignedToId,
+                Damages = vehicle.Damages.Select(d => new VehicleDamageViewModel
+                {
+                    Id = d.Id,
+                    DamageType = d.DamageType,
+                    Description = d.Description,
+                    ReportDate = d.ReportDate
+                }).ToList()
+            };
 
+            ViewBag.Brands = new SelectList(_context.Brands, "Id", "Name");
+            ViewBag.Employees = new SelectList(_context.Employee, "Id", "FullName");
 
+            return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Updatecar(Vehicle vehicle)
+        public async Task<IActionResult> Updatecar(UpdateCarViewModel vehicle)
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.Brands = new SelectList(_context.Brands, "Id", "Name");
+                ViewBag.Employees = new SelectList(_context.Employee, "Id", "FullName");
                 return View(vehicle);
             }
-            var existingVehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicle.Id);
+
+            var existingVehicle = await _context.Vehicles
+                .FirstOrDefaultAsync(a => a.Id == vehicle.Id);
+
             if (existingVehicle == null)
-            {
                 return NotFound("ARAÇ BULUNAMADI");
-            }
+
             existingVehicle.PlateNumber = vehicle.PlateNumber;
-            existingVehicle.CarModel = vehicle.CarModel;               // tek tek kontrol etmmemi sağlıyor 
+            existingVehicle.BrandId = vehicle.BrandId;
+            existingVehicle.CarModel = vehicle.CarModel;
             existingVehicle.Year = vehicle.Year;
             existingVehicle.Kilometer = vehicle.Kilometer;
+            existingVehicle.Type = vehicle.Type;
+            existingVehicle.GearType = vehicle.GearType;
             existingVehicle.Status = vehicle.Status;
+            existingVehicle.AssignmentStatus = vehicle.AssignmentStatus;
+            existingVehicle.AssignedToId = vehicle.AssignedToId;
+
             await _context.SaveChangesAsync();
             return RedirectToAction("GetCarAll");
-
         }
+
+
+        
         [HttpPost]
         public async Task<IActionResult> Deletecar(int Id)
         {

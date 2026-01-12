@@ -1,107 +1,115 @@
 ﻿@model List<Customer>
 @{
-    ViewData["Title"] = "Tüm Müşteriler";
+    ViewData["Title"] = "Müşteri Listesi";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    .table-card {
-        border-radius: 16px;
-        overflow: hidden;
-        border: none;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
-    }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-        .table-card .card-header {
-            background: white;
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: 600;
-            border-bottom: 1px solid #e5e5e5;
+<div class="container py-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">Müşteri Portföyü</h4>
+            <span class="text-muted small">Kayıtlı müşteriler ve sorumlu personel bilgileri.</span>
+        </div>
+
+        <div class="mt-3 mt-md-0 position-relative">
+            <span class="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input id="searchInput" class="form-control form-control-lg border-0 bg-white shadow-sm ps-5" placeholder="Müşteri ara (Ad, ID, Email)..." style="min-width: 300px; font-size: 0.95rem;">
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <div class="mb-3 text-muted opacity-25">
+                    <i class="fa-solid fa-users-slash fa-4x"></i>
+                </div>
+                <h5 class="fw-bold text-muted">Kayıtlı müşteri yok</h5>
+                <p class="text-muted small mb-0">Sistemde henüz bir müşteri kaydı bulunmamaktadır.</p>
+            </div>
         }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="customerTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3 ps-4 text-secondary text-uppercase small fw-bold" style="width: 5%;">ID</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold">MÜŞTERİ ADI</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold">İLETİŞİM</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold" style="width: 25%;">ADRES</th>
+                            <th class="py-3 pe-4 text-secondary text-uppercase small fw-bold">ATANAN PERSONEL</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var customer in Model)
+                        {
+                            <tr class="customer-row">
+                                <td class="ps-4 fw-bold text-muted small">#@customer.Id</td>
 
-    table thead {
-        background: #f8f9fa;
-        font-weight: 600;
-        font-size: 15px;
-    }
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px; font-weight: bold;">
+                                            @customer.Name.Substring(0, 1)@customer.Surname.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">@customer.Name @customer.Surname</div>
+                                        </div>
+                                    </div>
+                                </td>
 
-    table tbody tr:hover {
-        background: #f3f6fb;
-        cursor: pointer;
-    }
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark small mb-1">
+                                            <i class="fa-regular fa-envelope me-2 text-muted" style="width:16px;"></i>@customer.Email
+                                        </span>
+                                        <span class="text-muted small">
+                                            <i class="fa-solid fa-phone me-2 text-muted" style="width:16px;"></i>@customer.PhoneNumber
+                                        </span>
+                                    </div>
+                                </td>
 
-    .badge-emp {
-        padding: 7px 10px;
-        border-radius: 10px;
-    }
-</style>
+                                <td>
+                                    <span class="text-muted small d-inline-block text-truncate" style="max-width: 250px;" title="@customer.Address">
+                                        <i class="fa-solid fa-location-dot me-1 text-secondary opacity-50"></i> @customer.Address
+                                    </span>
+                                </td>
 
-
-<!-- 🔍 TEK ARAMA KUTUSU -->
-<div class="card p-3 mt-4 mb-3">
-    <input id="searchInput" class="form-control" placeholder="Müşteriler içinde ara... (ID, Ad, Email vb.)" />
-</div>
-
-
-<!-- 📄 TABLO -->
-<div class="card table-card">
-    <div class="card-header">
-        <i class="fa-solid fa-users text-primary me-2"></i> Müşteri Listesi
-    </div>
-
-    <div class="card-body p-0">
-        <table class="table table-hover table-striped mb-0" id="customerTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ad</th>
-                    <th>Soyad</th>
-                    <th>Email</th>
-                    <th>Telefon</th>
-                    <th>Adres</th>
-                    <th>Atanan Personel</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @foreach (var customer in Model)
-                {
-                    <tr>
-                        <td>@customer.Id</td>
-                        <td>@customer.Name</td>
-                        <td>@customer.Surname</td>
-                        <td>@customer.Email</td>
-                        <td>@customer.PhoneNumber</td>
-                        <td>@customer.Address</td>
-
-                        <td>
-                            @if (customer.Employee != null)
-                            {
-                                <span class="badge bg-primary bg-opacity-10 text-primary badge-emp">
-                                    <i class="fa-solid fa-user me-1"></i>
-                                    @customer.Employee.Name @customer.Employee.Surname
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary badge-emp">
-                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
-                                    Sorumlu Yok
-                                </span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                <td class="pe-4">
+                                    @if (customer.Employee != null)
+                                    {
+                                        <div class="d-flex align-items-center px-3 py-1 rounded-pill bg-success bg-opacity-10 border border-success border-opacity-10" style="width: fit-content;">
+                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px; font-size: 0.7rem;">
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+                                            <span class="text-success fw-medium small">@customer.Employee.Name @customer.Employee.Surname</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center px-3 py-1 rounded-pill bg-secondary bg-opacity-10 border border-secondary border-opacity-10" style="width: fit-content;">
+                                            <i class="fa-solid fa-circle-exclamation me-2 text-secondary small"></i>
+                                            <span class="text-secondary fw-medium small">Sorumlu Yok</span>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </div>
 
-
-<!-- 🔎 TEK INPUT FİLTRELEME SCRIPT'İ -->
 <script>
-    document.getElementById("searchInput").addEventListener("keyup", function () {
+    document.getElementById("searchInput")?.addEventListener("keyup", function () {
         let value = this.value.toLowerCase();
         let rows = document.querySelectorAll("#customerTable tbody tr");
 
@@ -111,3 +119,12 @@
         });
     });
 </script>
+
+<style>
+    /* Tablo Hover Efekti */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+</style>

@@ -276,11 +276,14 @@
     <aside class="sidebar">
         <div class="sidebar-brand">
             <i class="fa-solid fa-chart-simple text-white me-2 fs-4"></i>
-            <div class="brand-text">Admin<span>Pro</span></div>
+            <div class="brand-text">Admin<span>Car</span></div>
         </div>
 
         <div class="nav-container">
-
+            <div class="menu-label">
+                <a href="/Admin/AdminDashboard">Anasayfa</a>
+                
+            </div>
             <div class="menu-label">CRM YÖNETİMİ</div>
 
             <div class="nav-item-group">
@@ -293,7 +296,7 @@
                 </a>
                 <div class="submenu" id="customers">
                     <a href="/Customer/GetCustomerAll">Tüm Müşteriler</a>
-                    <a href="/Customer/CreatCustomer">Müşteri Oluştur</a>
+                    <a href="/Customer/CreateCustomer">Müşteri Oluştur</a>
                 </div>
             </div>
 
@@ -382,13 +385,7 @@
                 <li><a class="dropdown-item rounded" href="/Account/Profile"><i class="fa-regular fa-user me-2 text-primary"></i>Profilim</a></li>
                 <li><a class="dropdown-item rounded" href="/Account/Settings"><i class="fa-solid fa-sliders me-2 text-secondary"></i>Ayarlar</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li>
-                    <form asp-controller="Account" asp-action="Logout" method="post">
-                        <button class="dropdown-item rounded text-danger fw-bold" type="submit">
-                            <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Çıkış
-                        </button>
-                    </form>
-                </li>
+              
             </ul>
         </div>
     </header>

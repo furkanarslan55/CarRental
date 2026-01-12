@@ -1,100 +1,161 @@
 ﻿@model List<CarRentalEmployeeApp.ViewModels.EmployeeListViewModel>
 
 @{
-    ViewData["Title"] = "Get Employee Details";
+    ViewData["Title"] = "Personel Listesi";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container py-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">Personel Yönetimi</h4>
+            <span class="text-muted small">Toplam @Model.Count kayıt listeleniyor</span>
+        </div>
+
+        <div class="mt-3 mt-md-0 position-relative">
+            <span class="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" id="searchInput" class="form-control form-control-lg border-0 bg-white shadow-sm ps-5" placeholder="Personel ara..." style="min-width: 300px; font-size: 0.95rem;">
+        </div>
     </div>
-}
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        @if (Model.Count == 0)
+        {
+            <div class="text-center py-5">
+                <div class="mb-3 text-muted opacity-25">
+                    <i class="fa-solid fa-users-slash fa-4x"></i>
+                </div>
+                <h5 class="fw-bold text-muted">Henüz kayıtlı personel yok</h5>
+                <p class="text-muted small mb-4">Sisteme yeni bir çalışan ekleyerek başlayın.</p>
+                <a href="/Employee/Create" class="btn btn-primary rounded-pill px-4">
+                    <i class="fa-solid fa-plus me-2"></i>Yeni Ekle
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3 ps-4 text-secondary text-uppercase small fw-bold" style="width: 5%;">ID</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold">PERSONEL</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold">İLETİŞİM</th>
+                            <th class="py-3 text-secondary text-uppercase small fw-bold">DURUM</th>
+                            <th class="py-3 pe-4 text-end text-secondary text-uppercase small fw-bold" style="width: 15%;">İŞLEMLER</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach (var item in Model)
+                        {
+                            <tr class="employee-row">
+                                <td class="ps-4 fw-bold text-muted">#@item.Id</td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-initial rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px;">
+                                            @item.Name.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark employee-name">@item.Name @item.Surname</div>
+                                            <div class="small text-muted">Web Developer</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark small"><i class="fa-regular fa-envelope me-2 text-muted"></i>@item.Email</span>
+                                        <span class="text-muted small mt-1"><i class="fa-solid fa-phone me-2 text-muted"></i>@item.PhoneNumber</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-normal px-3 py-2 rounded-pill">Aktif</span>
+                                </td>
+
+                                <td class="pe-4 text-end">
+                                    <div class="btn-group gap-2">
+                                        <a asp-action="DetailsEmploye" asp-route-id="@item.Id"
+                                           class="btn btn-light btn-sm rounded-2 text-dark"
+                                           data-bs-toggle="tooltip" title="Detay">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        <a asp-action="UpdateEmploye" asp-route-id="@item.Id"
+                                           class="btn btn-light btn-sm rounded-2 text-primary"
+                                           data-bs-toggle="tooltip" title="Düzenle">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+
+                                        <a asp-action="DeleteEmploye" asp-route-id="@item.Id"
+                                           class="btn btn-light btn-sm rounded-2 text-danger"
+                                           onclick="return confirm('Bu personeli silmek istediğinize emin misiniz?')"
+                                           data-bs-toggle="tooltip" title="Sil">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
-}
-
-
-@if (Model.Count == 0)
-{
-    <div class="alert alert-info" role="alert">
-        Kayıtlı personel bulunmamaktadır.
-    </div>
-}
-else
-{
-    <h2>Personel Listesi</h2>
-
-    <input type="text"
-           id="searchInput"
-           class="form-control mb-3"
-           placeholder="İsim ara..." />
-
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Ad</th>
-                <th>Soyad</th>
-                <th>Email</th>
-                <th>Telefon</th>
-                <th>İşlemler</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr class="employee-row">
-                    <td>@item.Id</td>
-                    <td class="employee-name">@item.Name</td>
-                    <td>@item.Surname</td>
-                    <td>@item.Email</td>
-                    <td>@item.PhoneNumber</td>
-                    <td>
-                        <a asp-action="DetailsEmploye"
-                           asp-route-id="@item.Id"
-                           class="btn btn-info btn-sm">
-                            Detay
-                        </a>
-
-                        <a asp-action="UpdateEmploye"
-                           asp-route-id="@item.Id"
-                           class="btn btn-warning btn-sm">
-                            Düzenle
-                        </a>
-
-                        <a asp-action="DeleteEmploye"
-                           asp-route-id="@item.Id"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Silmek istediğinize emin misiniz?')">
-                            Sil
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+</div>
 
 <script>
+    // Arama Fonksiyonu
     document.getElementById("searchInput")?.addEventListener("keyup", function () {
         let aranan = this.value.toLowerCase();
         let satirlar = document.getElementsByClassName("employee-row");
 
         for (let i = 0; i < satirlar.length; i++) {
             let satirMetni = satirlar[i].innerText.toLowerCase();
-
-            if (satirMetni.includes(aranan)) {
-                satirlar[i].style.display = "";
-            } else {
-                satirlar[i].style.display = "none";
-            }
+            satirlar[i].style.display = satirMetni.includes(aranan) ? "" : "none";
         }
     });
+
+    // Tooltipleri aktifleştirmek için (Bootstrap 5)
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 </script>
+
+<style>
+    /* Tablo Hover Efekti - Minimal */
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    /* İkon Buton Hover Efektleri */
+    .btn-light:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+</style>
