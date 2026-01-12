@@ -7,41 +7,68 @@
 
 <h2>Müşteri Güncelle</h2>
 
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0">👤 Müşteri Bilgilerini Güncelle</h4>
+                </div>
 
-<form asp-action="UpdateCustomer" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Ad</label>
-        <input asp-for="Name" class="form-control" placeholder="Ad giriniz" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Surname" class="form-label">Soyad</label>
-        <input asp-for="Surname" class="form-control" placeholder="Soyad giriniz" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label">Email</label>
-        <input asp-for="Email" type="email" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="PhoneNumber" class="form-label">Email</label>
-        <input asp-for="PhoneNumber" type="number" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Address" class="form-label">Email</label>
-        <input asp-for="Address" type="text" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Address" class="form-label">Email</label>
-        <input asp-for="Address" type="text" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="EmployeeId" class="form-label">Sorumlu</label>
-        <input asp-for="EmployeeId" type="text" class="form-control" />
-    </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("UpdateCustomer", "Customer", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Id)
 
-    <button type="submit" class="btn btn-primary">Güncelle</button>
-    <a asp-action="GetCustomerAll" class="btn btn-secondary">Geri Gel</a>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.Name, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Ad" })
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger small" })
+                            </div>
 
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.Surname, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Surname, new { @class = "form-control", placeholder = "Soyad" })
+                                @Html.ValidationMessageFor(m => m.Surname, "", new { @class = "text-danger small" })
+                            </div>
 
+                            <div class="col-12">
+                                @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "E-posta" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                            </div>
 
-    </form>
+                            <div class="col-12">
+                                @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Telefon Numarası" })
+                                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12">
+                                @Html.LabelFor(m => m.Address, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Adres" })
+                            </div>
+                            <div class="col-12">
+                                @Html.LabelFor(m => m.EmployeeName, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.EmployeeName, new { @class = "form-control", placeholder = "Sorumlu" })
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("GetCustomerAll", "Customer")" class="btn btn-outline-secondary px-4">
+                                ❌ İptal
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                💾 Güncelle
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -68,51 +68,11 @@ namespace CarRentalEmployeeApp.Controllers
             return RedirectToAction("Login");
         }
 
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register()
-        {
-            return View();
-        }
+      
 
 
 
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var employee = new Employee
-            {
-
-                Name = model.Name,
-                Surname = model.Surname,
-                UserName = model.Email,
-                Email = model.Email,
-                PhoneNumber = model.Phone,
-                Address = model.Address
-
-            };
-
-            var result = await _userManager.CreateAsync(employee, model.Password);
-
-            if (result.Succeeded)
-            {
-                // Employee rolünü atıyoruz
-                await _userManager.AddToRoleAsync(employee, "Employee");
-                TempData["SuccessMessage"] = "Çalışan başarıyla eklendi";
-                return RedirectToAction("AdminDashboard","Admin"); // Admin paneline geri dön
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-
-            return View(model);
-        }
 
     
         }

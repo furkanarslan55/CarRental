@@ -1,4 +1,4 @@
-using CarRentalEmployeeApp.Models;
+ï»¿using CarRentalEmployeeApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,32 +13,32 @@ builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddIdentity<Employee, IdentityRole>(
-    
+
     Options =>
     {
         Options.Password.RequireDigit = true;
-        Options.Password.RequireLowercase = true;  // þifre kurallarý   
+        Options.Password.RequireLowercase = true;  //sifre kurallari  
         Options.Password.RequireUppercase = true;
         Options.Password.RequireNonAlphanumeric = false;
         Options.Password.RequiredLength = 6;
         Options.User.RequireUniqueEmail = true;
     }
     )
-    
-    .AddEntityFrameworkStores<CarRentalEmployeeApp.Data.CarRentalDbContext>()  //ýdentity kýsmý 
+
+    .AddEntityFrameworkStores<CarRentalEmployeeApp.Data.CarRentalDbContext>()  // identity kismi 
     .AddDefaultTokenProviders();
 
 
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Account/Login";  // Login olmayaný buraya yönlendir
+    options.LoginPath = "/Account/Login";  // Login olmayanÃ½ buraya yÃ¶nlendir
 });
 
 
 
 builder.Services.AddDbContext<CarRentalEmployeeApp.Data.CarRentalDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  //veritabaný baðlantýsý
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  //veritabani baglantisi
 
 
 var app = builder.Build();
@@ -71,7 +71,7 @@ using (var scope = app.Services.CreateScope())
             Email = adminEmail,
             Name = "Admin",
             Surname = "User",
-            Address = "Varsayýlan Yönetici Adresi",
+            Address = "VarsayÃ½lan YÃ¶netici Adresi",
             PhoneNumber = "0000000000",
             EmailConfirmed = true,
             PhoneNumberConfirmed = true,

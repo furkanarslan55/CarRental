@@ -16,10 +16,12 @@ namespace CarRentalEmployeeApp.Controllers
     {
         private readonly UserManager<Employee> _userManager;
         private readonly CarRentalDbContext _context;
-        public AdminController(CarRentalDbContext context, UserManager<Employee> userManager)
+        private readonly SignInManager<Employee> _signInManager;
+        public AdminController(CarRentalDbContext context, UserManager<Employee> userManager, SignInManager<Employee> signInManager)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
         [HttpGet]
         public async Task<IActionResult> GetCarAll()
@@ -340,24 +342,33 @@ namespace CarRentalEmployeeApp.Controllers
                 Address = model.Address,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
+                UserName = model.Email
+
 
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (result.Succeeded)
             {
+                // Employee rolünü atıyoruz
                 await _userManager.AddToRoleAsync(user, "Employee");
+               
+                TempData["SuccessMessage"] = "Çalışan başarıyla eklendi";
+                return RedirectToAction("AdminDashboard", "Admin"); // Admin paneline geri dön
             }
+
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                ModelState.AddModelError("", error.Description);
             }
 
-            _context.Employee.Add(user);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("GetEmploye");
-
+            return View(model);
         }
+
+
+
+
+        
         [HttpGet]
         public async Task<IActionResult> UpdateEmploye(string Id)
         {
