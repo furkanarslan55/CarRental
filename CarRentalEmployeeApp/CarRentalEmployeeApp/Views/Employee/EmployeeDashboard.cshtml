@@ -1,13 +1,141 @@
 ﻿@{
-    ViewData["Title"] = "EmployeeDashboard";
+    ViewData["Title"] = "Personel Dashboard";
     Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
 }
 
-<div class="d-flex justify-content-center align-items-center flex-column" style="min-height:70vh;">
-    <h2 class="mb-4">Hoşgeldiniz, @User.FindFirst("Name")</h2>
+<div class="container-fluid">
+
+    <!-- HOŞGELDİN -->
+    <div class="mb-4">
+        <h2 class="fw-semibold">Hoşgeldiniz, @User.FindFirst("Name")</h2>
+        <p class="text-muted">Güncel operasyon özetiniz aşağıdadır.</p>
+    </div>
+
+    <!-- İSTATİSTİK KARTLARI -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h6 class="text-muted">Toplam Müşteri</h6>
+                <h3 class="fw-bold">120</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h6 class="text-muted">Aktif Kiralama</h6>
+                <h3 class="fw-bold">18</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h6 class="text-muted">Boştaki Araç</h6>
+                <h3 class="fw-bold">42</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRAFİKLER -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h6 class="fw-semibold mb-3">Aylık Kiralama Sayısı</h6>
+                <canvas id="rentalChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h6 class="fw-semibold mb-3">Araç Durum Dağılımı</h6>
+                <canvas id="carStatusChart" height="120"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LİSTELER -->
+    <div class="row g-4">
+
+        <!-- SON EKLENEN MÜŞTERİLER -->
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h6 class="fw-semibold mb-3">Son Eklenen Müşteriler</h6>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Ahmet Yılmaz</span>
+                        <small class="text-muted">2 gün önce</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Mehmet Kaya</span>
+                        <small class="text-muted">3 gün önce</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Ayşe Demir</span>
+                        <small class="text-muted">5 gün önce</small>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <!-- SON KİRAYA VERİLEN ARAÇLAR -->
+        <div class="col-lg-6">
+            <div class="card p-4">
+                <h6 class="fw-semibold mb-3">Son Kiraya Verilen Araçlar</h6>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>34 ABC 123 - Fiat Egea</span>
+                        <small class="text-muted">Bugün</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>06 XYZ 789 - Renault Clio</span>
+                        <small class="text-muted">1 gün önce</small>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>35 DEF 456 - Toyota Corolla</span>
+                        <small class="text-muted">2 gün önce</small>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
 
 </div>
-
 @section Scripts {
-    <!-- Gerekirse JS kodları buraya -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Aylık Kiralama Grafiği
+        new Chart(document.getElementById('rentalChart'), {
+            type: 'line',
+            data: {
+                labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                datasets: [{
+                    label: 'Kiralama Sayısı',
+                    data: [12, 19, 14, 22, 18, 25],
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            }
+        });
+
+        // Araç Durum Grafiği
+        new Chart(document.getElementById('carStatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Kirada', 'Boşta', 'Bakımda'],
+                datasets: [{
+                    data: [18, 42, 5],
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
 }

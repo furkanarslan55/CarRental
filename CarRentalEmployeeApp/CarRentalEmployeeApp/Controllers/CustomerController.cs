@@ -86,11 +86,11 @@ namespace CarRentalEmployeeApp.Controllers
             await _context.SaveChangesAsync();
             if (roles.Contains("Admin"))
             {
-                TempData["RedirectUrl"] = Url.Action("AdminDashboard", "Admin");
+                return RedirectToAction("AdminDashboard", "Admin");
             }
-            else if(roles.Contains("Employee"))
+            else if (roles.Contains("Employee"))
             {
-                TempData["RedirectUrl"] = Url.Action("EmployeeDashboard", "Employee");
+                return RedirectToAction("EmployeeDashboard", "Employee");
             }
 
             return RedirectToAction("GetCustomerAll");

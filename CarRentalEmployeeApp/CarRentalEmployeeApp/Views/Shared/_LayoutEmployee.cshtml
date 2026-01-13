@@ -210,6 +210,39 @@
             }
             /* Mobil menü tetikleyici eklenebilir */
         }
+        /* -------- TOGGLE SUBMENU -------- */
+        .nav-item-group .nav-link {
+            justify-content: space-between;
+        }
+
+        .arrow-icon {
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            display: none;
+            padding-left: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+            .submenu a {
+                display: block;
+                padding: 6px 0;
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                text-decoration: none;
+            }
+
+                .submenu a:hover,
+                .submenu a.active {
+                    color: var(--accent-color);
+                }
+
     </style>
 </head>
 
@@ -224,33 +257,112 @@
         </div>
 
         <div class="nav flex-column">
-            <span class="text-uppercase text-muted fw-bold mb-2 ms-2" style="font-size: 0.7rem; letter-spacing: 1px;">Yönetim</span>
 
-            <a href="/Employee/Index" class="nav-link">
-                <i class="fa-solid fa-list-check"></i>
-                <span>İş Listem</span>
-            </a>
+            <span class="text-uppercase text-muted fw-bold mb-2 ms-2"
+                  style="font-size: 0.7rem; letter-spacing: 1px;">Yönetim</span>
 
-            <a href="/Employee/DashboardCustomer" class="nav-link">
-                <i class="fa-solid fa-users-line"></i>
-                <span>Müşteri Portföyü</span>
-            </a>
+            <!-- DASHBOARD -->
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('dashboard', this)">
+                    <div>
+                        <i class="fa-solid fa-house"></i>
+                        <span>Anasayfa</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="dashboard">
+                    <a href="/Employee/EmployeeDashboard">Genel Bakış</a>
+                    <a href="/Employee/Stats">İstatistikler</a>
+                </div>
+            </div>
 
-            <span class="text-uppercase text-muted fw-bold mb-2 ms-2 mt-4" style="font-size: 0.7rem; letter-spacing: 1px;">Operasyon</span>
+            <!-- İŞ YÖNETİMİ -->
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('tasks', this)">
+                    <div>
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>İş Yönetimi</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="tasks">
+                    <a href="/Employee/Index">İş Listem</a>
+                    <a href="/Employee/CreateTask">Yeni İş</a>
+                    <a href="/Employee/Completed">Tamamlananlar</a>
+                </div>
+            </div>
 
-            <a href="/Rental/RentalCar" class="nav-link">
-                <i class="fa-solid fa-car-side"></i>
-                <span>Araç Durumları</span>
-            </a>
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-gas-pump"></i>
-                <span>Yakıt & Bakım</span>
-            </a>
+            <!-- MÜŞTERİ -->
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('customers', this)">
+                    <div>
+                        <i class="fa-solid fa-users-line"></i>
+                        <span>Müşteriler</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="customers">
+                    <a href="/Employee/DashboardCustomer">Müşteri Listesi</a>
+                    <a href="/Customer/CreateCustomer">Yeni Müşteri</a>
+                </div>
+            </div>
+
+            <span class="text-uppercase text-muted fw-bold mb-2 ms-2 mt-4"
+                  style="font-size: 0.7rem; letter-spacing: 1px;">Operasyon</span>
+
+            <!-- ARAÇ -->
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('cars', this)">
+                    <div>
+                        <i class="fa-solid fa-car-side"></i>
+                        <span>Araç İşlemleri</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="cars">
+                    <a href="/Rental/RentalCar">Tüm Araçlar</a>
+                    <a href="/Rental/Assignments">Araç Kiralama</a>
+                    <a href="/Rental/History">Araç Kira Uzatma</a>
+                    <a href="/Rental/History">Araç Teslim Alma</a>
+                </div>
+            </div>
+
+            <!-- BAKIM -->
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('maintenance', this)">
+                    <div>
+                        <i class="fa-solid fa-gas-pump"></i>
+                        <span>Bakım & Muayane</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="maintenance">
+                    <a href="#">Bakım Girişi</a>
+                    <a href="#">Bakım Geçmişi</a>
+                </div>
+            </div>
+            <div class="nav-item-group">
+                <a class="nav-link" onclick="toggleMenu('fatura', this)">
+                    <div>
+                        <i class="fa-solid fa-file-invoice"></i>
+
+                        <span>Fatura İşlemleri</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </a>
+                <div class="submenu" id="fatura">
+                    <a href="#">Fatura Kesme</a>
+                    <a href="#">Fatura Girişi</a>
+                    <a href="#">Tüm Faturalar</a>
+                </div>
+            </div>
+
         </div>
 
         <div class="sidebar-footer">
             <form asp-controller="Account" asp-action="Logout" method="post">
-                <button type="submit" class="nav-link w-100 border-0 bg-transparent text-start text-danger">
+                <button type="submit"
+                        class="nav-link w-100 border-0 bg-transparent text-start text-danger">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Güvenli Çıkış</span>
                 </button>
@@ -319,5 +431,39 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        function toggleMenu(id, el) {
+            document.querySelectorAll('.submenu').forEach(menu => {
+                if (menu.id !== id) menu.style.display = 'none';
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link !== el) link.classList.remove('active');
+            });
+
+            const submenu = document.getElementById(id);
+            if (submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+                el.classList.remove('active');
+            } else {
+                submenu.style.display = 'block';
+                el.classList.add('active');
+            }
+        }
+
+        // URL'ye göre otomatik açık menü
+        document.addEventListener("DOMContentLoaded", function () {
+            const path = window.location.pathname;
+            document.querySelectorAll('.submenu a').forEach(link => {
+                if (link.getAttribute('href') === path) {
+                    link.classList.add('active');
+                    const submenu = link.closest('.submenu');
+                    submenu.style.display = 'block';
+                    submenu.previousElementSibling.classList.add('active');
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
