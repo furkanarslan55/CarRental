@@ -4,6 +4,7 @@ using CarRentalEmployeeApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalEmployeeApp.Controllers
@@ -23,12 +24,24 @@ namespace CarRentalEmployeeApp.Controllers
 
 
 
-
         [HttpGet]
-        public IActionResult CreateCustomer()
+        public async Task<IActionResult> CreateCustomer()
         {
+            var employees = await _context.Users
+                .Select(e => new
+                {
+                    e.Id,
+                    FullName = string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.Surname)
+                        ? e.UserName
+                        : e.Name + " " + e.Surname
+                })
+                .ToListAsync();
+
+            ViewBag.Employees = new SelectList(employees, "Id", "FullName");
+
             return View();
         }
+
 
 
 
@@ -36,16 +49,26 @@ namespace CarRentalEmployeeApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCustomer(CustomerCreateViewModel model)
         {
-
-
             if (!ModelState.IsValid)
             {
+                ViewBag.Employees = new SelectList(
+                    await _context.Users.Select(e => new
+                    {
+                        e.Id,
+                        FullName = string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.Surname)
+                            ? e.UserName
+                            : e.Name + " " + e.Surname
+                    }).ToListAsync(),
+                    "Id",
+                    "FullName"
+                );
 
                 return View(model);
             }
-            var users = await _userManager.GetUserAsync(User); // modelden sonra kontrol etmek daha mantıklı boş yere kulllanıcıyı çekmemize gerek yok
 
-
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+                return Unauthorized();
 
             var customer = new Customer
             {
@@ -54,45 +77,51 @@ namespace CarRentalEmployeeApp.Controllers
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
+                EmployeeId = model.EmployeeId, // 🔥 SORUMLU PERSONEL
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = users.UserName
-
-
-
+                CreatedBy = $"{currentUser.Name} {currentUser.Surname}"
             };
+            var roles = await _userManager.GetRolesAsync(currentUser);
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
+            if (roles.Contains("Admin"))
+            {
+                TempData["RedirectUrl"] = Url.Action("AdminDashboard", "Admin");
+            }
+            else if(roles.Contains("Employee"))
+            {
+                TempData["RedirectUrl"] = Url.Action("EmployeeDashboard", "Employee");
+            }
 
-
-            return RedirectToAction(nameof(GetCustomerAll));
+            return RedirectToAction("GetCustomerAll");
         }
 
         public async Task<IActionResult> GetCustomerAll()
         {
-            // Veritabanından veriyi çekerken aynı anda ViewModel'e dönüştürüyoruz.
-            var model = await _context.Customers.Include(a=> a.Employee)
+            var model = await _context.Customers
+                .Include(c => c.Employee)
                 .Select(x => new CustomerViewModel
                 {
-
                     Id = x.Id,
                     Name = x.Name,
                     Surname = x.Surname,
                     Email = x.Email,
-                    Address =x.Address,
+                    Address = x.Address,
                     PhoneNumber = x.PhoneNumber,
                     CreatedAt = x.CreatedAt,
                     CreatedBy = x.CreatedBy,
-                    EmployeeName = x.Employee != null ? x.Employee.Name + " " + x.Employee.Surname : null, 
 
-
-
-
-                }).ToListAsync();
-
-
+                    EmployeeName = x.Employee == null
+                        ? "-"
+                        : string.IsNullOrEmpty(x.Employee.Name)
+                            ? x.Employee.UserName
+                            : x.Employee.Name + " " + x.Employee.Surname
+                })
+                .ToListAsync();
 
             return View(model);
         }
+
 
 
         [HttpPost]
@@ -118,9 +147,9 @@ namespace CarRentalEmployeeApp.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateCustomer(int Id)
         {
-            var exictingcustomer =await _context.Customers.FindAsync(Id); // find methodu primary key ile arama yapar.FirstOrDefault a göre daha hızlıdır.
+            var customer =await _context.Customers.FindAsync(Id); // find methodu primary key ile arama yapar.FirstOrDefault a göre daha hızlıdır.
 
-            if (exictingcustomer == null)
+            if (customer == null)
             {
 
 
@@ -130,13 +159,21 @@ namespace CarRentalEmployeeApp.Controllers
             }
             var model = new CustomerUpdateViewModel
             {
-              Id = exictingcustomer.Id,
-                Name = exictingcustomer.Name,
-                Surname = exictingcustomer.Surname,
-                Email = exictingcustomer.Email,
-                Address = exictingcustomer.Address,
-                PhoneNumber = exictingcustomer.PhoneNumber,
-                EmployeeId = exictingcustomer.EmployeeId,
+                Id = customer.Id,
+                Name = customer.Name,
+                Surname = customer.Surname,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Address = customer.Address,
+                EmployeeId = customer.EmployeeId,
+
+                Employees = await _context.Employee
+              .Select(e => new SelectListItem
+              {
+                  Value = e.Id.ToString(),
+                  Text = e.Name + " " + e.Surname
+              })
+              .ToListAsync()
             };
 
             return View(model);
@@ -153,6 +190,18 @@ namespace CarRentalEmployeeApp.Controllers
 
 
         {
+            if (!ModelState.IsValid)
+            {
+                model.Employees = await _context.Employee
+                    .Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),
+                        Text = e.Name + " " + e.Surname
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
             var user = await _context.Customers.FirstOrDefaultAsync(u => u.Id == model.Id);
             if (user == null) {
 
@@ -207,7 +256,7 @@ namespace CarRentalEmployeeApp.Controllers
                 PhoneNumber = exictingcustomer.PhoneNumber,
                 CreatedAt = exictingcustomer.CreatedAt,
                 CreatedBy = exictingcustomer.CreatedBy,
-                EmployeeId = exictingcustomer.EmployeeId
+                EmployeeName = exictingcustomer.EmployeeId
 
 
 

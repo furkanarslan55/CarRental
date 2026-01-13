@@ -5,42 +5,99 @@
     ViewData["Title"] = "Yeni Müşteri Ekle";
 }
 
-<h2 class="mb-3">Yeni Müşteri Ekle</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<form asp-action="AddCustomer" method="post" class="mt-3">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-    <div class="form-group mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Yeni Müşteri Kaydı</h4>
+                    <span class="text-muted small">Müşteri portföyüne yeni bir kişi ekleyin.</span>
+                </div>
+                <a href="/Customer/Index" class="btn btn-outline-secondary btn-sm px-3 rounded-2">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Listeye Dön
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-5">
+
+                    <form asp-controller="Customer" asp-action="CreateCustomer" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm rounded-2 mb-4"></div>
+
+                        <h6 class="text-uppercase text-muted fw-bold small mb-4">Kişisel Bilgiler</h6>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label fw-medium text-secondary small">AD</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 text-muted"><i class="fa-regular fa-user"></i></span>
+                                    <input asp-for="Name" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="Örn: Ahmet" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-secondary small">SOYAD</label>
+                                <input asp-for="Surname" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="Örn: Yılmaz" />
+                                <span asp-validation-for="Surname" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-5 border-secondary border-opacity-10">
+
+                        <h6 class="text-uppercase text-muted fw-bold small mb-4">İletişim & Adres</h6>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-medium text-secondary small">E-POSTA ADRESİ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 text-muted"><i class="fa-regular fa-envelope"></i></span>
+                                    <input asp-for="Email" type="email" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="ad.soyad@mail.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-medium text-secondary small">TELEFON</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 text-muted"><i class="fa-solid fa-phone"></i></span>
+                                    <input asp-for="PhoneNumber" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="05xx xxx xx xx" />
+                                </div>
+                                <span asp-validation-for="PhoneNumber" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label fw-medium text-secondary small">AÇIK ADRES</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0 text-muted pt-3 align-items-start"><i class="fa-solid fa-map-location-dot"></i></span>
+                                    <textarea asp-for="Address" class="form-control bg-light border-0 fs-6" rows="3" placeholder="Mahalle, Cadde, Sokak, Kapı No..."></textarea>
+                                </div>
+                                <span asp-validation-for="Address" class="text-danger small mt-1 d-block"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
+                            <a href="/Customer/GetCustomerAll" class="btn btn-light px-4 py-2 rounded-2 text-muted fw-medium">İptal</a>
+                            <button type="submit" class="btn btn-dark px-5 py-2 rounded-2 fw-medium shadow-sm">
+                                <i class="fa-solid fa-save me-2"></i>Müşteriyi Kaydet
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Surname" class="form-label"></label>
-        <input asp-for="Surname" class="form-control" />
-        <span asp-validation-for="Surname" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="PhoneNumber" class="form-label"></label>
-        <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Address" class="form-label"></label>
-        <textarea asp-for="Address" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Address" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Kaydet</button>
-    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-
-</form>
-
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

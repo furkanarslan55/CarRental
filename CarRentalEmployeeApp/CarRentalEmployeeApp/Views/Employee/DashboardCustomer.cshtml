@@ -4,38 +4,157 @@
     Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold text-dark mb-1">Müşteri Portföyü</h2>
-        <p class="text-muted mb-0">Sorumluluğunuzdaki müşterilerin iletişim bilgileri ve geçmişi.</p>
-    </div>
-    <a class="btn btn-primary shadow-sm" href="/Employee/AddCustomer">
-        Yeni Müşteri
-    </a>
-</div>
+<style>
+    /* Modern Minimalist Stil Tanımları */
+    .page-header {
+        background: transparent;
+    }
 
-<div class="card mb-4">
-    <div class="card-body p-2">
-        <div class="input-group">
-            <span class="input-group-text bg-white border-0 ps-3"><i class="fa-solid fa-search text-muted"></i></span>
-            <input type="text" class="form-control border-0" placeholder="İsim, e-posta veya telefon ile arayın...">
-            <button class="btn btn-light border ms-2">Filtrele</button>
+    .search-box {
+        background: #fff;
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+        .search-box:focus-within {
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+            border-color: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+    .table-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .custom-table thead th {
+        border-bottom: 1px solid #f0f0f0;
+        color: #9ca3af;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1.5rem 1rem;
+        background: #fff;
+    }
+
+    .custom-table tbody td {
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f8f9fa;
+        color: #4b5563;
+        font-size: 0.95rem;
+    }
+
+    .custom-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .custom-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #fcfcfc;
+        }
+
+    /* Avatar Stili */
+    .avatar-modern {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+        color: white;
+        border-radius: 12px; /* Hafif karemsi yuvarlak - modern trend */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Butonlar */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #9ca3af;
+        transition: all 0.2s;
+        background: transparent;
+    }
+
+        .btn-action:hover {
+            background-color: #f3f4f6;
+            color: #4f46e5;
+        }
+
+    .btn-add-new {
+        background-color: #111827; /* Koyu antrasit - premium his */
+        color: white;
+        border-radius: 50px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        border: none;
+    }
+
+        .btn-add-new:hover {
+            background-color: #000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: white;
+        }
+
+    .empty-state-minimal {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px dashed #e5e7eb;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-2">Müşteriler</h1>
+            <p class="text-muted mb-0 small">Aktif portföyünüzdeki müşteri listesi ve detayları.</p>
+        </div>
+        <a class="btn btn-add-new shadow-sm text-decoration-none" href="/Customer/CreateCustomer">
+            <i class="fa-solid fa-plus me-2"></i>Yeni Müşteri
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <div class="search-box d-flex align-items-center">
+                <i class="fa-solid fa-search text-muted me-3"></i>
+                <input type="text" class="form-control border-0 bg-transparent shadow-none p-0" placeholder="İsim, e-posta veya telefon ile arayın...">
+            </div>
         </div>
     </div>
-</div>
 
-@if (Model != null && Model.Any())
-{
-    <div class="card table-card">
-        <div class="card-body p-0">
+    @if (Model != null && Model.Any())
+    {
+        <div class="card table-card bg-white">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table custom-table mb-0">
                     <thead>
                         <tr>
-                            <th class="ps-4">Müşteri Adı</th>
+                            <th class="ps-4">Müşteri</th>
                             <th>İletişim</th>
-                            <th>Lokasyon</th>
-                            <th class="text-end pe-4">İşlemler</th>
+                            <th>Konum</th>
+                            <th class="text-end pe-4"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,42 +163,40 @@
                             <tr>
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-circle">
+                                        <div class="avatar-modern">
                                             @customer.Name.Substring(0, 1).ToUpper()
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark">@customer.Name</div>
-                                            <small class="text-muted">ID: #@customer.Id</small>
+                                            <div class="small text-muted" style="font-size: 0.75rem;">ID: #@customer.Id</div>
                                         </div>
                                     </div>
                                 </td>
 
                                 <td>
                                     <div class="d-flex flex-column">
-                                        <a href="mailto:@customer.Email" class="text-decoration-none text-muted mb-1 small">
-                                            <i class="fa-regular fa-envelope me-1"></i> @customer.Email
+                                        <a href="mailto:@customer.Email" class="text-decoration-none text-dark mb-1 small">
+                                            @customer.Email
                                         </a>
-                                        <a href="tel:@customer.PhoneNumber" class="text-decoration-none text-dark fw-bold small">
-                                            <i class="fa-solid fa-phone me-1 text-success"></i> @customer.PhoneNumber
-                                        </a>
+                                        <span class="text-muted small">@customer.PhoneNumber</span>
                                     </div>
                                 </td>
 
                                 <td>
-                                    <span class="text-muted small">
-                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i> @customer.Address
+                                    <span class="badge bg-light text-secondary border fw-normal">
+                                        @customer.Address
                                     </span>
                                 </td>
 
                                 <td class="text-end pe-4">
-                                    <div class="btn-group">
-                                        <a href="#" class="btn btn-sm btn-light text-primary border" title="Detaylar">
-                                            <i class="fa-solid fa-eye"></i>
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="#" class="btn-action" title="Detaylar" data-bs-toggle="tooltip">
+                                            <i class="fa-regular fa-eye"></i>
                                         </a>
-                                        <a href="#" class="btn btn-sm btn-light text-secondary border" title="Düzenle">
-                                            <i class="fa-solid fa-pen"></i>
+                                        <a href="#" class="btn-action" title="Düzenle">
+                                            <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
-                                        <a href="tel:@customer.PhoneNumber" class="btn btn-sm btn-success bg-opacity-10 text-success border-0" title="Hemen Ara">
+                                        <a href="tel:@customer.PhoneNumber" class="btn-action text-success" title="Ara">
                                             <i class="fa-solid fa-phone"></i>
                                         </a>
                                     </div>
@@ -89,22 +206,22 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card-footer bg-white border-0 py-3 text-end">
+                <small class="text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">TOPLAM @Model.Count MÜŞTERİ</small>
+            </div>
         </div>
-        <div class="card-footer bg-white border-top text-center py-3">
-            <small class="text-muted">Toplam @Model.Count müşteri görüntüleniyor.</small>
-        </div>
-    </div>
-}
-else
-{
-    <div class="card empty-state shadow-sm">
-        <div class="card-body">
-            <i class="fa-solid fa-users-slash empty-icon"></i>
-            <h4 class="fw-bold text-dark">Henüz Müşteri Yok</h4>
-            <p class="text-muted">Şu anda sorumluluğunuzda atanmış herhangi bir müşteri bulunmamaktadır.</p>
-            <a href="/Employee/AddCustomer" class="btn btn-outline-primary mt-2">
-                <i class="fa-solid fa-plus me-2"></i>Müşteri Ekle
+    }
+    else
+    {
+        <div class="empty-state-minimal mt-5">
+            <div class="mb-3 text-muted opacity-25">
+                <i class="fa-solid fa-users fa-4x"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Kayıt Bulunamadı</h5>
+            <p class="text-muted mb-4 small">Henüz eklenmiş bir müşteri kaydı yok.</p>
+            <a href="/Customer/UpdateCustomer" class="btn btn-outline-dark btn-sm rounded-pill px-4">
+                İlk Müşteriyi Ekle
             </a>
         </div>
-    </div>
-}
+    }
+</div>

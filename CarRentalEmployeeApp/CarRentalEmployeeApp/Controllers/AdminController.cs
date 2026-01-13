@@ -194,7 +194,7 @@ namespace CarRentalEmployeeApp.Controllers
             };
 
             ViewBag.Brands = new SelectList(_context.Brands, "Id", "Name");
-            ViewBag.Employees = new SelectList(_context.Employee, "Id", "FullName");
+            ViewBag.Employees = new SelectList(_context.Employee, "Id", "Name");
 
             return View(model);
         }
@@ -290,7 +290,7 @@ namespace CarRentalEmployeeApp.Controllers
             _context.Brands.Add(brand);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("GetCarAll");
+            return RedirectToAction("BrandList");
         }
 
         public async Task<IActionResult> BrandList()  //tüm araçları include etmektense n+1 problemi yaşamamak için sadece count bilgisini alıyorum

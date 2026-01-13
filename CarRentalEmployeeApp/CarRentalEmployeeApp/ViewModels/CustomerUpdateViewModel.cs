@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace CarRentalEmployeeApp.ViewModels
 {
@@ -18,7 +19,10 @@ namespace CarRentalEmployeeApp.ViewModels
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
 
+        [Required(ErrorMessage = "Lütfen sorumlu personel seçiniz")]
         public string? EmployeeId { get; set; }
-        public string? EmployeeName { get; set; }
+
+        // Dropdown listesi
+        public List<SelectListItem> Employees { get; set; }
     }
 }

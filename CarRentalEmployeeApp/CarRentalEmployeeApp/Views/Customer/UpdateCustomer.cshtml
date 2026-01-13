@@ -90,13 +90,23 @@
                             <div class="col-12">
                                 <label class="form-label fw-medium text-secondary small">SORUMLU PERSONEL</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0 text-muted"><i class="fa-solid fa-user-tie"></i></span>
-                                    @Html.TextBoxFor(m => m.EmployeeName, new { @class = "form-control form-control-lg bg-light border-0 fs-6", placeholder = "Sorumlu personel adı" })
-                                </div>
-                                <div class="form-text text-muted small">Bu alan sadece bilgilendirme amaçlıdır veya yönetici tarafından değiştirilebilir.</div>
+                                    <span class="input-group-text bg-light border-0 text-muted">
+                                        <i class="fa-solid fa-user-tie"></i>
+                                    </span>
+
+                                    @Html.DropDownListFor(
+                                    m => m.EmployeeId,
+                                                                Model.Employees,
+                                                                "Personel Seçiniz",
+                                                                new { @class = "form-control form-control-lg bg-light border-0 fs-6" }
+                                                                )
                             </div>
+                            @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "text-danger small mt-1 d-block" })
                         </div>
 
+                                <div class="form-text text-muted small">Bu alan sadece bilgilendirme amaçlıdır veya yönetici tarafından değiştirilebilir.</div>
+                            </div>
+                   
                         <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
                             <a href="@Url.Action("GetCustomerAll", "Customer")" class="btn btn-light px-4 py-2 rounded-2 text-muted fw-medium">
                                 İptal

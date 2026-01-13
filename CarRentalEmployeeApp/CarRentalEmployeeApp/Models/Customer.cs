@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace CarRentalEmployeeApp.Models
@@ -17,7 +18,9 @@ namespace CarRentalEmployeeApp.Models
         public string? EmployeeId { get; set; }
         
         public Employee Employee { get; set; }
+        [BindNever]
         public DateTime CreatedAt { get; set; }
+        [BindNever]
         public string CreatedBy { get; set; }
 
 

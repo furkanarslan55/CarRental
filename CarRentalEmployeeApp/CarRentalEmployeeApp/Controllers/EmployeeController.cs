@@ -9,7 +9,7 @@ using System;
 
 namespace CarRentalEmployeeApp.Controllers
 {
-    [Authorize(Roles ="Employee, Admin")]
+    [Authorize(Roles ="Employee ")]
     public class EmployeeController : Controller
     {
 
@@ -31,8 +31,7 @@ namespace CarRentalEmployeeApp.Controllers
 
 
 
-        // Dashboard: kendi müşteri listesini görür
-        [HttpGet]
+       [HttpGet]
         public async Task<IActionResult> DashboardCustomer()
         {
             var employee = await _userManager.GetUserAsync(User); //employe içindeki ıd yi alıyoruz
@@ -41,11 +40,11 @@ namespace CarRentalEmployeeApp.Controllers
             var customers = _context.Customers
                 .Where(c => c.EmployeeId == employee.Id)
                 .ToList();
-       
+
             return View(customers);
         }
 
-      
+
 
 
 
@@ -79,86 +78,10 @@ namespace CarRentalEmployeeApp.Controllers
         }
 
 
-        [HttpGet]
-        public IActionResult AddCustomer()
-        {
-            return View();
-        }
-
-
-        [HttpPost]
-        public async Task<IActionResult> AddCustomer(CustomerCreateViewModel model)
-        {
-            var employee = await _userManager.GetUserAsync(User);
-            if (!ModelState.IsValid)
-                return View(model);
-          
-            if (employee == null)
-                return Unauthorized();
-
-           var createcustomer = new Customer
-            {
-                Name = model.Name,
-                Surname = model.Surname,
-                Email = model.Email,
-                PhoneNumber = model.PhoneNumber,
-                Address = model.Address,
-                EmployeeId = employee.Id
-            };
-
-            _context.Customers.Add(createcustomer);
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("DashboardCustomer");
-        }
-
+        
     
 
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetCustomer(int id)
-        {
-            var employee = await _userManager.GetUserAsync(User);
-            if (employee == null)
-                return Unauthorized();
-
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.EmployeeId == employee.Id && c.Id == id);
-
-            if (customer == null)
-                return NotFound();
-
-            return View(customer);
-        }
-
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> GetCustomerUpdate(Customer customers)
-        {
-            if (!ModelState.IsValid)
-                return View(customers);
-
-            var employee = await _userManager.GetUserAsync(User);
-
-            var existingCustomer = await _context.Customers
-                .FirstOrDefaultAsync(x => x.Id == customers.Id && x.EmployeeId == employee.Id);
-
-            if (existingCustomer == null)
-                return NotFound();
-
-            existingCustomer.Name = customers.Name;
-            existingCustomer.Email = customers.Email;
-            existingCustomer.PhoneNumber = customers.PhoneNumber;
-            existingCustomer.Address = customers.Address;
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("DashboardCustomer");
-        }
 
         
 

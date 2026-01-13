@@ -16,7 +16,11 @@ namespace CarRentalEmployeeApp.ViewModels
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Adres alanı zorunludur")]
         public string Address { get; set; }
-      
-        
+
+
+        [Required(ErrorMessage = "Sorumlu personel seçilmelidir")]
+        public string EmployeeId { get; set; }
+
+
     }
 }
