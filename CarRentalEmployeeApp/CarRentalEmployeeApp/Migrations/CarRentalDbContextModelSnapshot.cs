@@ -190,6 +190,9 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("DailyPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("EmployeeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -238,6 +241,9 @@ namespace CarRentalEmployeeApp.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("DailyPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("GearType")
                         .HasColumnType("int");

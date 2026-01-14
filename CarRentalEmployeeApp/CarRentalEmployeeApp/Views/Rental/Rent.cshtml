@@ -1,0 +1,80 @@
+﻿@model CarRentalEmployeeApp.ViewModels.VehicleRentalPageViewModel
+
+    @{
+        if (User.IsInRole("Admin"))
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
+    }
+    }
+@{
+    ViewData["Title"] = "Araç Kirala";
+  
+}
+
+<h2>Araç Kiralama</h2>
+
+<hr />
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>Araç Bilgileri</h5>
+
+        <p><strong>Plaka:</strong> @Model.PlateNumber</p>
+        <p><strong>Model:</strong> @Model.CarModel</p>
+        <p><strong>Yıl:</strong> @Model.Year</p>
+        <p><strong>Kilometre:</strong> @Model.Kilometer</p>
+    </div>
+</div>
+
+<form asp-action="Rent" method="post">
+
+    <!-- VehicleId -->
+    <input type="hidden" asp-for="Rental.VehicleId" />
+
+    <!-- Müşteri -->
+    <div class="form-group mb-3">
+        <label asp-for="Rental.CustomerId" class="form-label">Müşteri</label>
+        <select asp-for="Rental.CustomerId"
+                asp-items="Model.Rental.Customers"
+                class="form-control">
+            <option value="">Müşteri seçiniz</option>
+        </select>
+        <span asp-validation-for="Rental.CustomerId" class="text-danger"></span>
+    </div>
+
+    <!-- Başlangıç -->
+    <div class="form-group mb-3">
+        <label asp-for="Rental.StartRental" class="form-label">Başlangıç Tarihi</label>
+        <input asp-for="Rental.StartRental" type="date" class="form-control" />
+        <span asp-validation-for="Rental.StartRental" class="text-danger"></span>
+    </div>
+
+    <!-- Bitiş -->
+    <div class="form-group mb-3">
+        <label asp-for="Rental.EndRental" class="form-label">Bitiş Tarihi</label>
+        <input asp-for="Rental.EndRental" type="date" class="form-control" />
+        <span asp-validation-for="Rental.EndRental" class="text-danger"></span>
+    </div>
+
+    <!-- Fiyat -->
+    <div class="form-group mb-3">
+        <label asp-for="Rental.DailyPrice" class="form-label">Günlük Fiyat (₺)</label>
+        <input asp-for="Rental.DailyPrice" class="form-control" />
+        <span asp-validation-for="Rental.DailyPrice" class="text-danger"></span>
+    </div>
+
+    <div class="text-danger mb-3">
+        @Html.ValidationSummary()
+    </div>
+
+    <button type="submit" class="btn btn-success">Kirala</button>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

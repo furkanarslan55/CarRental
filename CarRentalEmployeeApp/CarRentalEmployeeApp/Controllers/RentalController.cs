@@ -2,138 +2,154 @@
 using CarRentalEmployeeApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using CarRentalEmployeeApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace CarRentalEmployeeApp.Controllers
+public class RentalController : Controller
 {
-    public class RentalController : Controller
+    private readonly CarRentalDbContext _context;
+    private readonly UserManager<Employee> _userManager;
+
+    public RentalController(CarRentalDbContext context, UserManager<Employee> userManager)
     {
+        _context = context;
+        _userManager = userManager;
+    }
 
-        private readonly CarRentalDbContext _context;
-        private readonly UserManager<Employee> _userManager;//kullanıcı yönetimi için
-        public RentalController(CarRentalDbContext context, UserManager<Employee> userManager)
-        {
-            _context = context;
-            _userManager = userManager;
-        }
+    // 1️⃣ Kiralanabilir araçlar listesi
+    [HttpGet]
+    public async Task<IActionResult> RentalCar()
+    {
+        var employee = await _userManager.GetUserAsync(User);
+        if (employee == null)
+            return RedirectToAction("Login", "Account");
 
-
-        [HttpGet]
-        public async Task<IActionResult> RentalCar()
-
-        {
-            var employee = await _userManager.GetUserAsync(User);
-
-            if (employee == null) 
-                {
-
-                return RedirectToAction("Login", "Account");
-                  }
-
-
-            var assignedVehicles = await _context.Vehicles
-                .Where(v => v.AssignedToId == employee.Id && v.Status ==VehicleStatus.Flexible)
-                .ToListAsync();
-
-
-
-
-            return View(assignedVehicles);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> Rent(int id)
-        {
-            var employee = await _userManager.GetUserAsync(User);
-            if (employee == null)
+        var vehicles = await _context.Vehicles
+            .Where(v => v.AssignedToId == employee.Id &&
+                        v.Status == VehicleStatus.Flexible)
+            .Select(v => new VehicleRentalListVM
             {
-                return RedirectToAction("Login", "Account");
-            }
-            var vehicle = await _context.Vehicles.FindAsync(id);
-            if (vehicle == null || vehicle.AssignedToId != employee.Id || vehicle.Status != VehicleStatus.Flexible)
-            {
-                return NotFound();
-            }
+                VehicleId = v.Id,
+                PlateNumber = v.PlateNumber,
+                CarModel = v.CarModel,
+                Year = v.Year!.Value,
+                Kilometer = v.Kilometer!.Value,
+                DailyPrice = v.DailyPrice
 
-            var model = new VehicleRentalCreateViewModel
+            })
+            .ToListAsync();
+
+        return View(vehicles);
+    }
+    [HttpGet]
+    public async Task<IActionResult> Rent(int vehicleId)
+    {
+        var employee = await _userManager.GetUserAsync(User);
+        if (employee == null)
+            return RedirectToAction("Login", "Account");
+
+        var vehicle = await _context.Vehicles
+            .FirstOrDefaultAsync(v => v.Id == vehicleId);
+
+        if (vehicle == null)
+            return NotFound();
+
+        // Admin her aracı görebilir
+        if (!User.IsInRole("Admin") &&
+            vehicle.AssignedToId != employee.Id)
+            return Forbid();
+
+        var model = new VehicleRentalPageViewModel
+        {
+            PlateNumber = vehicle.PlateNumber,
+            CarModel = vehicle.CarModel,
+            Year = vehicle.Year,
+            Kilometer = vehicle.Kilometer,
+            Rental = new VehicleRentalCreateViewModel
             {
                 VehicleId = vehicle.Id,
-                PlateNumber = vehicle.PlateNumber,
-                CarModel = vehicle.CarModel,
-                Year = vehicle.Year!.Value,
-                Kilometer = vehicle.Kilometer!.Value
+                DailyPrice = vehicle.DailyPrice,
+                Customers = await GetCustomersSelectList()
+            }
+        };
+
+        return View(model);
+    }
 
 
 
-            };
+    [HttpPost]
+    public async Task<IActionResult> Rent(VehicleRentalPageViewModel pageModel)
+    {
+        var employee = await _userManager.GetUserAsync(User);
+        if (employee == null)
+            return RedirectToAction("Login", "Account");
 
+        // 🔑 Formdan gelen asıl model
+        var model = pageModel.Rental;
 
-            return View(model);
-        }
+        var vehicle = await _context.Vehicles
+            .FirstOrDefaultAsync(v => v.Id == model.VehicleId);
 
+        if (vehicle == null)
+            return NotFound();
 
-
-        [HttpPost]
-
-        public async Task<IActionResult> RentalCar(VehicleRentalCreateViewModel model)
+        // ❌ Validation
+        if (!ModelState.IsValid || model.StartRental >= model.EndRental)
         {
-            var employee = await _userManager.GetUserAsync(User);
+            if (model.StartRental >= model.EndRental)
+                ModelState.AddModelError("", "Bitiş tarihi başlangıçtan sonra olmalıdır.");
 
+            // View tekrar render edileceği için eksik alanları doldur
+            pageModel.PlateNumber = vehicle.PlateNumber;
+            pageModel.CarModel = vehicle.CarModel;
+            pageModel.Year = vehicle.Year;
+            pageModel.Kilometer = vehicle.Kilometer;
+            pageModel.Rental.Customers = await GetCustomersSelectList();
 
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var vehicle = await _context.Vehicles.FindAsync(model.VehicleId);
-            if (vehicle == null ||
-               vehicle.AssignedToId != employee.Id ||
-               vehicle.Status != VehicleStatus.Flexible)
-            {
-                return View("Rent",model);
-            }
-
-            var rental = new Rental
-            {
-                VehicleId = model.VehicleId,
-                CustomerId = model.CustomerId,
-                StartRental = model.StartRental,
-                EndRental = model.EndRental,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                EmployeeId = employee.Id
-            };
-
-
-
-            vehicle.Status = VehicleStatus.Busy;
-
-            _context.Rentals.Add(rental);
-            _context.Vehicles.Update(vehicle);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("RentalCar");
+            return View(pageModel);
         }
 
+        // ✅ Yetki kontrolü
+        if (!User.IsInRole("Admin") &&
+            vehicle.AssignedToId != employee.Id)
+            return Forbid();
+
+        if (vehicle.Status != VehicleStatus.Flexible)
+            return BadRequest();
+
+        // ✅ Kayıt
+        var rental = new Rental
+        {
+            VehicleId = model.VehicleId,
+            CustomerId = model.CustomerId,
+            StartRental = model.StartRental,
+            EndRental = model.EndRental,
+            DailyPrice = model.DailyPrice,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            EmployeeId = employee.Id
+        };
+
+        vehicle.Status = VehicleStatus.Busy;
+
+        _context.Rentals.Add(rental);
+        _context.Vehicles.Update(vehicle);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("RentalCar");
+    }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private async Task<List<SelectListItem>> GetCustomersSelectList()
+    {
+        return await _context.Customers
+            .Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToListAsync();
     }
 }

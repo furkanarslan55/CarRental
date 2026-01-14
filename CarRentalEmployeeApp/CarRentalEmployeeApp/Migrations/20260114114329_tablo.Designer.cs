@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalEmployeeApp.Migrations
 {
     [DbContext(typeof(CarRentalDbContext))]
-    [Migration("20260113084618_13.01")]
-    partial class _1301
+    [Migration("20260114114329_tablo")]
+    partial class tablo
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,6 +193,9 @@ namespace CarRentalEmployeeApp.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("DailyPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("EmployeeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -241,6 +244,9 @@ namespace CarRentalEmployeeApp.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("DailyPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("GearType")
                         .HasColumnType("int");

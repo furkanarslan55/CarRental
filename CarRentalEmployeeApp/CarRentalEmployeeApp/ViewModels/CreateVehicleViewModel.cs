@@ -29,6 +29,8 @@ namespace CarRentalEmployeeApp.ViewModels
 
         [Range(0, int.MaxValue)]
         public int Kilometer { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal DailyPrice { get; set; }
 
         public VehicleStatus Status { get; set; }
 

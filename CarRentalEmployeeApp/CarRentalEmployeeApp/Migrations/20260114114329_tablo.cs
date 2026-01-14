@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CarRentalEmployeeApp.Migrations
 {
     /// <inheritdoc />
-    public partial class database : Migration
+    public partial class tablo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -175,7 +175,7 @@ namespace CarRentalEmployeeApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "customers",
+                name: "Customers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -185,17 +185,18 @@ namespace CarRentalEmployeeApp.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_customers", x => x.Id);
+                    table.PrimaryKey("PK_Customers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_customers_AspNetUsers_EmployeeId",
+                        name: "FK_Customers_AspNetUsers_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -207,10 +208,11 @@ namespace CarRentalEmployeeApp.Migrations
                     PlateNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     BrandId = table.Column<int>(type: "int", nullable: false),
                     CarModel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Kilometer = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: true),
+                    Kilometer = table.Column<int>(type: "int", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GearType = table.Column<int>(type: "int", nullable: false),
+                    DailyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     AssignmentStatus = table.Column<int>(type: "int", nullable: false),
                     AssignedToId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -240,6 +242,7 @@ namespace CarRentalEmployeeApp.Migrations
                     VehicleId = table.Column<int>(type: "int", nullable: false),
                     StartRental = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndRental = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DailyPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     EmployeeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -255,17 +258,17 @@ namespace CarRentalEmployeeApp.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Rentals_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Rentals_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Rentals_customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -344,8 +347,8 @@ namespace CarRentalEmployeeApp.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_customers_EmployeeId",
-                table: "customers",
+                name: "IX_Customers_EmployeeId",
+                table: "Customers",
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
@@ -413,7 +416,7 @@ namespace CarRentalEmployeeApp.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "customers");
+                name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

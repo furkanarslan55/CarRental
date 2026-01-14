@@ -1,4 +1,6 @@
-﻿namespace CarRentalEmployeeApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CarRentalEmployeeApp.Models
 {
     public class Rental
     {
@@ -12,6 +14,8 @@
 
         public DateTime StartRental { get; set; }
         public DateTime EndRental { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DailyPrice { get; set; }
 
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }

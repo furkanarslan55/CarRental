@@ -1,27 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-
 namespace CarRentalEmployeeApp.ViewModels
 {
     public class VehicleRentalCreateViewModel
     {
-
-
+        [Required]
         public int VehicleId { get; set; }
-        public string PlateNumber { get; set; }
-        public string CarModel { get; set; }
-        public int Year { get; set; }
-        public int Kilometer { get; set; }
 
-
-
-
-        // Müşteri
         [Required]
         public int CustomerId { get; set; }
-        public List<SelectListItem> Customers { get; set; }
 
-        // Tarihler
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal DailyPrice { get; set; }
+
         [Required]
         [DataType(DataType.Date)]
         public DateTime StartRental { get; set; }
@@ -30,6 +22,8 @@ namespace CarRentalEmployeeApp.ViewModels
         [DataType(DataType.Date)]
         public DateTime EndRental { get; set; }
 
-
+        public List<SelectListItem> Customers { get; set; } = new();
     }
+
+
 }

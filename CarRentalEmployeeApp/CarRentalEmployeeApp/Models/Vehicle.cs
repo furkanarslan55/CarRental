@@ -21,7 +21,7 @@ namespace CarRentalEmployeeApp.Models
         [Display(Name = "Müsait")]
         Flexible = 0,
 
-        [Display(Name = "Dolu")]
+        [Display(Name = "Kirada")]
         Busy = 1,
 
         [Display(Name = "Bakımda")]
@@ -61,6 +61,9 @@ namespace CarRentalEmployeeApp.Models
 
         public GearType GearType { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        [Range(0, double.MaxValue)]
+        public decimal DailyPrice { get; set; }
         public VehicleStatus Status { get; set; } = VehicleStatus.Flexible;
 
         public AssignmentStatus AssignmentStatus { get; set; } = AssignmentStatus.free;

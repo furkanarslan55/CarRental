@@ -139,7 +139,9 @@ namespace CarRentalEmployeeApp.Controllers
                 Year = model.Year,
                 Kilometer = model.Kilometer,
                 GearType = model.GearType,
-                Status = model.Status
+                Status = model.Status,
+                DailyPrice = model.DailyPrice,
+
             };
 
             if (model.HasDamage && model.Damages != null && model.Damages.Any())

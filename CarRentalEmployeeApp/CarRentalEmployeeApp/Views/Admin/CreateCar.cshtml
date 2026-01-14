@@ -104,6 +104,14 @@
                                 </select>
                                 <span asp-validation-for="Status" class="text-danger small mt-1 d-block"></span>
                             </div>
+                            <div class="col-md-6">
+                                <label asp-for="DailyPrice" class="form-label fw-medium text-secondary small">GÜNLÜK FİYAT</label>
+                                <div class="input-group">
+                                    <input asp-for="DailyPrice" type="number" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="0" />
+                                    <span class="input-group-text bg-light border-0 text-muted small">TL</span>
+                                </div>
+                                <span asp-validation-for="DailyPrice" class="text-danger small mt-1 d-block"></span>
+                            </div>
                         </div>
 
                         <div class="card bg-light border-0 rounded-3 mt-5">
