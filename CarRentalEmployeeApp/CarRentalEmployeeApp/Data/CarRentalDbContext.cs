@@ -16,6 +16,7 @@ namespace CarRentalEmployeeApp.Data
         public DbSet<Employee> Employee { get; set; }
         public DbSet<Rental> Rentals { get; set; }
         public DbSet<Brand> Brands { get; set; }
+        public DbSet<VehicleDamage> VehicleDamages { get; set; }
 
         public CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : base(options)
         {

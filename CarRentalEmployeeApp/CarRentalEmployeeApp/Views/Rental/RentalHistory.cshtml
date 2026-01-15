@@ -1,0 +1,48 @@
+﻿@model List<CarRentalEmployeeApp.ViewModels.RentalHistoryViewModel>
+
+<h3 class="mb-4">📜 Geçmiş Kiralamalar</h3>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Plaka</th>
+            <th>Araç</th>
+            <th>Müşteri</th>
+            <th>Çalışan</th>
+            <th>Başlangıç</th>
+            <th>Bitiş</th>
+            <th>Gün</th>
+            <th>Toplam Ücret</th>
+            <th>Hasar</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.PlateNumber</td>
+                <td>@item.Brand @item.Model (@item.Year)</td>
+                <td>
+                    <strong>@item.CustomerFullName</strong><br />
+                    @item.PhoneNumber<br />
+                    @item.Email
+                </td>
+                <td>@item.EmployeeFullName</td>
+                <td>@item.StartRental.ToShortDateString()</td>
+                <td>@item.EndRental.ToShortDateString()</td>
+                <td>@item.TotalDays</td>
+                <td class="fw-bold text-success">@item.TotalPrice ₺</td>
+                <td>
+                    @if (item.HasDamage)
+                    {
+                        <span class="badge bg-danger">Var</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Yok</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

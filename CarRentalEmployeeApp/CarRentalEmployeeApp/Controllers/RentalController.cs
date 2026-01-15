@@ -225,7 +225,7 @@ public class RentalController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ReturnRent(int rentalId)
+    public async Task<IActionResult> MoreTimeRent(int rentalId)
 
     {
         var user = await _userManager.GetUserAsync(User);
@@ -262,7 +262,7 @@ public class RentalController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ReturnRent(ExtendRentalVM model)
+    public async Task<IActionResult> MoreTimeRent(ExtendRentalVM model)
     {
         var rental = await _context.Rentals
             .Include(r => r.Vehicle)
@@ -306,11 +306,132 @@ public class RentalController : Controller
     }
 
 
+    [HttpGet]
+    public async Task<IActionResult> ReturnCar(int rentalId)
+    {
+        var rental = await _context.Rentals
+            .Include(r => r.Vehicle)
+                .ThenInclude(v => v.CarBrand)
+            .Include(r => r.Customer)
+            .SingleOrDefaultAsync(r => r.Id == rentalId && r.IsActive);
 
+        if (rental == null)
+            return NotFound();
+
+        var viewModel = new VehicleReturnViewModel
+        {
+            VehicleId = rental.Vehicle.Id,
+            PlateNumber = rental.Vehicle.PlateNumber,
+            Brand = rental.Vehicle.CarBrand.Name,
+            Model = rental.Vehicle.CarModel,
+
+            CustomerId = rental.Customer.Id,
+            CustomerFullName = rental.Customer.Name + " " + rental.Customer.Surname,
+            CustomerPhone = rental.Customer.PhoneNumber,
+            ReturnDate = DateTime.Now
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReturnCar(VehicleReturnViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View("ReturnCar", model);
+
+        var rental = await _context.Rentals
+            .Include(r => r.Vehicle)
+            .FirstOrDefaultAsync(r =>
+                r.Vehicle.Id == model.VehicleId &&
+                r.IsActive);
+
+        if (rental == null)
+            return NotFound();
+
+        rental.EndRental = model.ReturnDate ?? DateTime.Now;
+        rental.IsActive = false;
+
+        rental.Vehicle.Status = VehicleStatus.Flexible;
+        rental.Vehicle.AssignmentStatus = AssignmentStatus.free;
+        rental.Vehicle.AssignedToId = null;
+
+        if (model.HasDamage)
+        {
+            if (model.DamageType == null)
+            {
+                ModelState.AddModelError("DamageType", "Hasar tipi seçilmelidir.");
+                return View("ReturnCar", model);
+            }
+
+            _context.VehicleDamages.Add(new VehicleDamage
+            {
+                VehicleId = rental.Vehicle.Id,
+                DamageType = model.DamageType.Value,
+                Description = model.DamageDescription ?? string.Empty,
+                ReportDate = DateTime.Now
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(RentalHistory));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> RentalHistory()
+    {
+        var history = await _context.Rentals
+            .Include(r => r.Vehicle)
+                .ThenInclude(v => v.CarBrand)
+            .Include(r => r.Customer)
+            .Include(r => r.Employee)
+            .Include(r => r.Vehicle.Damages)
+            .Where(r => !r.IsActive)
+            .Select(r => new RentalHistoryViewModel
+            {
+                RentalId = r.Id,
+                StartRental = r.StartRental,
+                EndRental = r.EndRental,
+
+                TotalDays = EF.Functions.DateDiffDay(r.StartRental, r.EndRental),
+                DailyPrice = r.DailyPrice,
+                TotalPrice =
+                    EF.Functions.DateDiffDay(r.StartRental, r.EndRental) * r.DailyPrice,
+
+                CreatedAt = r.CreatedAt,
+
+                VehicleId = r.Vehicle.Id,
+                PlateNumber = r.Vehicle.PlateNumber,
+                Brand = r.Vehicle.CarBrand.Name,
+                Model = r.Vehicle.CarModel,
+                Year = r.Vehicle.Year,
+                GearType = r.Vehicle.GearType.ToString(),
+
+                CustomerId = r.Customer.Id,
+                CustomerFullName = r.Customer.Name + " " + r.Customer.Surname,
+                PhoneNumber = r.Customer.PhoneNumber,
+                Email = r.Customer.Email,
+
+                EmployeeFullName = r.Employee.Name + " " + r.Employee.Surname,
+
+                HasDamage = r.Vehicle.Damages.Any()
+            })
+            .OrderByDescending(x => x.EndRental)
+            .ToListAsync();
+
+        return View(history);
+    }
+
+  
 
 
 
 }
+
+
+
 
 
 

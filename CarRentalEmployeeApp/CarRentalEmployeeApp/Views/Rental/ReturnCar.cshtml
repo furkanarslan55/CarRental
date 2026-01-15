@@ -1,0 +1,149 @@
+﻿@model CarRentalEmployeeApp.ViewModels.VehicleReturnViewModel
+@using CarRentalEmployeeApp.Models
+
+@{
+    ViewData["Title"] = "Araç Teslim Alma";
+}
+
+<div class="container mt-4">
+
+    <h3 class="mb-4 text-center fw-bold">🚗 Araç Teslim Alma</h3>
+
+    <form asp-action="ReturnCar" method="post">
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(x => x.VehicleId)
+        @Html.HiddenFor(x => x.CustomerId)
+
+        <!-- ARAÇ BİLGİLERİ -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white fw-semibold">
+                Araç Bilgileri
+            </div>
+            <div class="card-body row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Plaka</label>
+                    <input class="form-control" value="@Model.PlateNumber" readonly />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Marka</label>
+                    <input class="form-control" value="@Model.Brand" readonly />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Model</label>
+                    <input class="form-control" value="@Model.Model" readonly />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MÜŞTERİ BİLGİLERİ -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-secondary text-white fw-semibold">
+                Kiralayan Kişi Bilgileri
+            </div>
+            <div class="card-body row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Ad Soyad</label>
+                    <input class="form-control" value="@Model.CustomerFullName" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Telefon</label>
+                    <input class="form-control" value="@Model.CustomerPhone" readonly />
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TESLİM ALMA -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white fw-semibold">
+                Teslim Alma Bilgileri
+            </div>
+            <div class="card-body row g-3">
+
+                <div class="col-md-4">
+                    <label asp-for="ReturnDate" class="form-label">Teslim Alma Tarihi</label>
+                    <input asp-for="ReturnDate" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ReturnDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-8 d-flex align-items-center mt-4">
+                    <div class="form-check form-switch">
+                        <input asp-for="HasDamage"
+                               class="form-check-input"
+                               type="checkbox"
+                               id="hasDamageCheck"
+                               onchange="toggleDamage()" />
+                        <label class="form-check-label fw-semibold" for="hasDamageCheck">
+                            Araçta Hasar Var
+                        </label>
+                    </div>
+                </div>
+
+                <!-- HASAR ALANI -->
+                <div class="col-12 d-none" id="damageArea">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label asp-for="DamageType" class="form-label">Hasar Türü</label>
+                            <select asp-for="DamageType"
+                                    class="form-select"
+                                    asp-items="Html.GetEnumSelectList<DamageType>()">
+                                <option value="">Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="DamageType" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="DamageDescription" class="form-label">
+                                Hasar Açıklaması
+                            </label>
+                            <textarea asp-for="DamageDescription"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Hasar detayını giriniz...">
+                            </textarea>
+                            <span asp-validation-for="DamageDescription" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BUTONLAR -->
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Vazgeç
+            </a>
+            <button type="submit" class="btn btn-success px-4">
+                ✔ Aracı Teslim Al
+            </button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function toggleDamage() {
+            const check = document.getElementById("hasDamageCheck");
+            const area = document.getElementById("damageArea");
+
+            if (check.checked) {
+                area.classList.remove("d-none");
+            } else {
+                area.classList.add("d-none");
+            }
+        }
+    </script>
+}
