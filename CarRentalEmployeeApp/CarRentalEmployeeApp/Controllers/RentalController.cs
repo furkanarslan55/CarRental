@@ -152,4 +152,76 @@ public class RentalController : Controller
                 Text = c.Name
             }).ToListAsync();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> ActiveRent()
+    {
+
+        var employee = await _userManager.GetUserAsync(User);
+        if (employee == null)
+            return RedirectToAction("Login", "Account");
+
+        var roles = await _userManager.GetRolesAsync(employee);
+
+
+        if (roles.Contains("Admin"))
+        {
+
+            var model = _context.Rentals
+                .Where(r => r.IsActive)
+                .Include(r => r.Vehicle)
+                .Include(r => r.Customer)
+                .Select(r => new ActiveRentalListVM
+                {
+                    RentalId = r.Id,
+                    PlateNumber = r.Vehicle!.PlateNumber,
+                    CarModel = r.Vehicle!.CarModel,
+                    CustomerName = r.Customer!.Name,
+                    StartRental = r.StartRental,
+                    EndRental = r.EndRental,
+                    DailyPrice = r.DailyPrice
+                });
+
+            var activeRentals = await model.ToListAsync();
+            return View(activeRentals);
+
+
+
+        }
+
+        else if (roles.Contains("Employee"))
+
+        {
+            var model = _context.Rentals
+                .Where(r => r.IsActive && r.Vehicle!.AssignedToId == employee.Id)
+                .Include(r => r.Vehicle)
+                .Include(r => r.Customer)
+                .Select(r => new ActiveRentalListVM
+                {
+                    RentalId = r.Id,
+                    PlateNumber = r.Vehicle!.PlateNumber,
+                    CarModel = r.Vehicle!.CarModel,
+                    CustomerName = r.Customer!.Name,
+                    StartRental = r.StartRental,
+                    EndRental = r.EndRental,
+                    DailyPrice = r.DailyPrice
+                });
+            var activeRentals = await model.ToListAsync();
+
+
+
+            return View(activeRentals);
+
+        }
+
+
+
+        return Forbid();
+
+
+
+
+    }
+
+
 }

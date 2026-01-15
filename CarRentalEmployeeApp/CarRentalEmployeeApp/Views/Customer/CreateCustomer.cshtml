@@ -1,14 +1,5 @@
 ﻿@model CarRentalEmployeeApp.ViewModels.CustomerCreateViewModel
-@{
-    if (User.IsInRole("Admin"))
-    {
-        Layout = "~/Views/Shared/_Layout.cshtml";
-    }
-    else
-    {
-        Layout = "~/Views/Shared/_LayoutEmployee.cshtml";
-    }
-}
+
 @{
     ViewData["Title"] = "Yeni Müşteri Ekle";
 

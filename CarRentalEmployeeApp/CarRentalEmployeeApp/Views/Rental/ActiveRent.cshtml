@@ -1,0 +1,67 @@
+﻿@model IEnumerable<CarRentalEmployeeApp.ViewModels.ActiveRentalListVM>
+
+
+
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold"> Aktif Kiralamalar</h3>
+        <span class="badge bg-primary">
+            Toplam: @Model.Count()
+        </span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            Aktif kiralama bulunmamaktadır.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Plaka</th>
+                            <th>Araç</th>
+                            <th>Müşteri</th>
+                            <th>Başlangıç</th>
+                            <th>Bitiş</th>
+                            <th>Toplam Gün</th>
+                            <th>Toplam Fiyat</th>
+                            <th class="text-end">Günlük Ücret</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.RentalId</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        @item.PlateNumber
+                                    </span>
+                                </td>
+                                <td>@item.CarModel</td>
+                                <td>@item.CustomerName</td>
+                                <td>@item.StartRental.ToString("dd.MM.yyyy")</td>
+                                <td>@item.EndRental.ToString("dd.MM.yyyy")</td>
+                                <td>@item.TotalDays gün</td>
+                                <td class="fw-bold text-success">@item.TotalPrice.ToString("C")</td>
+                                <td class="text-end fw-bold text-success">
+                                    @item.DailyPrice.ToString("C")
+                                </td>
+                         
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
