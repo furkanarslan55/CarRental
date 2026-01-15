@@ -1,13 +1,10 @@
 ﻿@model IEnumerable<CarRentalEmployeeApp.ViewModels.ActiveRentalListVM>
 
-
-
-
 <div class="container-fluid mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold"> Aktif Kiralamalar</h3>
-        <span class="badge bg-primary">
+        <h3 class="fw-bold">🚗 Aktif Kiralamalar</h3>
+        <span class="badge bg-primary fs-6">
             Toplam: @Model.Count()
         </span>
     </div>
@@ -20,7 +17,7 @@
     }
     else
     {
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-0">
                 <table class="table table-hover mb-0 align-middle">
                     <thead class="table-dark">
@@ -34,6 +31,7 @@
                             <th>Toplam Gün</th>
                             <th>Toplam Fiyat</th>
                             <th class="text-end">Günlük Ücret</th>
+                            <th class="text-center">İşlem</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,21 +39,39 @@
                         {
                             <tr>
                                 <td class="fw-semibold">@item.RentalId</td>
+
                                 <td>
                                     <span class="badge bg-secondary">
                                         @item.PlateNumber
                                     </span>
                                 </td>
+
                                 <td>@item.CarModel</td>
                                 <td>@item.CustomerName</td>
                                 <td>@item.StartRental.ToString("dd.MM.yyyy")</td>
                                 <td>@item.EndRental.ToString("dd.MM.yyyy")</td>
-                                <td>@item.TotalDays gün</td>
-                                <td class="fw-bold text-success">@item.TotalPrice.ToString("C")</td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        @item.TotalDays gün
+                                    </span>
+                                </td>
+
+                                <td class="fw-bold text-success">
+                                    @item.TotalPrice.ToString("C")
+                                </td>
+
                                 <td class="text-end fw-bold text-success">
                                     @item.DailyPrice.ToString("C")
                                 </td>
-                         
+
+                                <td class="text-center">
+                                    <a asp-action="ReturnRent"
+                                       asp-route-rentalId="@item.RentalId"
+                                       class="btn btn-sm btn-outline-primary px-3">
+                                        ⏱ Kira Uzat
+                                    </a>
+                                </td>
                             </tr>
                         }
                     </tbody>

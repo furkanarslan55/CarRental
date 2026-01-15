@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using CarRentalEmployeeApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
+
 public class RentalController : Controller
 {
     private readonly CarRentalDbContext _context;
@@ -223,5 +224,105 @@ public class RentalController : Controller
 
     }
 
+    [HttpGet]
+    public async Task<IActionResult> ReturnRent(int rentalId)
+
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+
+      
+            var rental = await _context.Rentals
+      .Include(r => r.Vehicle)
+      .Include(r => r.Customer)
+      .SingleOrDefaultAsync(r => r.Id == rentalId && r.IsActive);
+        if (rental == null)
+        {
+            return NotFound(); 
+        }
+        var page = new ExtendRentalVM
+            {
+                RentalId = rental.Id,
+                PlateNumber = rental.Vehicle!.PlateNumber,
+                CustomerName = rental.Customer!.Name,
+                StartRental = rental.StartRental,
+                CurrentEndDate = rental.EndRental,
+                DailyPrice = rental.DailyPrice,
+                NewEndDate = rental.EndRental
+
+            };
+
+
+
+            return View(page);
+
+        }
+
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReturnRent(ExtendRentalVM model)
+    {
+        var rental = await _context.Rentals
+            .Include(r => r.Vehicle)
+            .Include(r => r.Customer)
+            .SingleOrDefaultAsync(r => r.Id == model.RentalId && r.IsActive);
+
+        if (rental == null)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+        {
+            FillViewModel(model, rental);
+            return View(model);
+        }
+
+        var extraDays = (model.NewEndDate.Date - rental.EndRental.Date).Days;
+
+        if (extraDays <= 0)
+        {
+            ModelState.AddModelError(nameof(model.NewEndDate),
+                "Yeni bitiş tarihi mevcut tarihten ileri olmalıdır.");
+
+            FillViewModel(model, rental);
+            return View(model);
+        }
+
+        rental.EndRental = model.NewEndDate;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Kira başarıyla uzatıldı.";
+        return RedirectToAction(nameof(ActiveRent));
+    }
+    // helper method kullanarak db yi daha az istekte bulunalım 
+    private static void FillViewModel(ExtendRentalVM model, Rental rental)
+    {
+        model.PlateNumber = rental.Vehicle!.PlateNumber;
+        model.CustomerName = rental.Customer!.Name;
+        model.StartRental = rental.StartRental;
+        model.CurrentEndDate = rental.EndRental;
+        model.DailyPrice = rental.DailyPrice;
+    }
+
+
+
+
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

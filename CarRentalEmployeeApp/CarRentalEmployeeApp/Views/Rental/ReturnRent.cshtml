@@ -1,0 +1,142 @@
+﻿@model CarRentalEmployeeApp.ViewModels.ExtendRentalVM
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card border border-light-subtle shadow-sm rounded-3">
+
+                <div class="card-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-primary"></i>
+                        <h6 class="m-0 fw-bold text-dark">Kira Uzatma İşlemi</h6>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="ReturnRent" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="RentalId" />
+                        <input type="hidden" asp-for="PlateNumber" />
+                        <input type="hidden" asp-for="CustomerName" />
+                        <input type="hidden" asp-for="StartRental" />
+                        <input type="hidden" asp-for="CurrentEndDate" />
+                        <input type="hidden" asp-for="DailyPrice" />
+
+                        <input type="hidden" id="currentEndDate" value="@Model.CurrentEndDate.ToString("yyyy-MM-dd")" />
+                        <input type="hidden" id="dailyPrice" value="@Model.DailyPrice.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+
+
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3 ls-1">Mevcut Kira Bilgileri</h6>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small mb-1">Araç Plakası</label>
+                                <input class="form-control bg-light border-0 fw-medium text-dark"
+                                       value="@Model.PlateNumber" readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small mb-1">Müşteri Adı</label>
+                                <input class="form-control bg-light border-0 fw-medium text-dark"
+                                       value="@Model.CustomerName" readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small mb-1">Başlangıç Tarihi</label>
+                                <input class="form-control bg-light border-0 text-dark"
+                                       value="@Model.StartRental.ToString("dd.MM.yyyy")" readonly />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-secondary small mb-1">Mevcut Bitiş</label>
+                                <input class="form-control bg-light border-0 text-dark"
+                                       value="@Model.CurrentEndDate.ToString("dd.MM.yyyy")" readonly />
+                            </div>
+                        </div>
+
+                        <hr class="border-light-subtle my-4" />
+
+                        <div class="mb-4">
+                            <label asp-for="NewEndDate" class="form-label fw-bold text-dark">
+                                Yeni Bitiş Tarihi Seçin
+                            </label>
+                            <input asp-for="NewEndDate" type="date" class="form-control form-control-lg border-secondary-subtle" />
+                            <span asp-validation-for="NewEndDate" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="bg-light bg-opacity-50 border rounded-2 p-3 mb-4">
+                            <div class="row align-items-center">
+                                <div class="col-4 border-end">
+                                    <small class="text-muted d-block">Günlük Fiyat</small>
+                                    <span class="fw-medium text-dark">@Model.DailyPrice.ToString("C")</span>
+                                </div>
+                                <div class="col-4 border-end text-center">
+                                    <small class="text-muted d-block">Ek Süre</small>
+                                    <span id="extraDays" class="fw-bold text-primary">@Model.ExtraDays gün</span>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <small class="text-muted d-block">Fark Ücreti</small>
+                                    <span id="extraPrice" class="fw-bold text-success fs-5">
+                                        @Model.ExtraPrice.ToString("C")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="ActiveRent" class="btn btn-light border text-secondary px-4">
+                                Vazgeç
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">
+                                Değişiklikleri Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const newEndDateInput = document.getElementById("NewEndDate");
+
+        const currentEndDate = new Date(
+            document.getElementById("currentEndDate").value
+        );
+
+        const dailyPrice = parseFloat(
+            document.getElementById("dailyPrice").value
+        );
+
+        const extraDaysEl = document.getElementById("extraDays");
+        const extraPriceEl = document.getElementById("extraPrice");
+
+        newEndDateInput.addEventListener("change", function () {
+            if (!this.value) return;
+
+            const newEndDate = new Date(this.value);
+
+            // Saat farklarını temizle
+            currentEndDate.setHours(0, 0, 0, 0);
+            newEndDate.setHours(0, 0, 0, 0);
+
+            const diffTime = newEndDate - currentEndDate;
+            // Negatif gün çıkmasını engellemek için Math.max
+            const diffDays = Math.max(diffTime / (1000 * 60 * 60 * 24), 0);
+            const totalPrice = diffDays * dailyPrice;
+
+            extraDaysEl.innerText = diffDays + " gün";
+            extraPriceEl.innerText = totalPrice.toLocaleString("tr-TR", {
+                style: "currency",
+                currency: "TRY"
+            });
+        });
+    </script>
+}
